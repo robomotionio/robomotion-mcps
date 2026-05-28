@@ -1,0 +1,23 @@
+type: mcp
+name: gcp-cloudsql-sqlserver
+title: Cloud SQL for SQL Server (Google Cloud)
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: Databases
+summary: Google's managed remote MCP server for Cloud SQL for SQL Server. Tools
+  for managing SQL Server instances, databases, users, and operations through
+  the Cloud SQL Admin API. Rides Robomotion credproxy — the Google Cloud OAuth
+  access token (from Application Default Credentials) is swapped into the
+  Authorization header at egress; the sandbox sees only a placeholder.
+source_url: https://docs.cloud.google.com/sql/docs/sqlserver/use-cloudsql-mcp
+tags: [google-cloud, gcp, cloud-sql, sql-server, database, databases, managed]
+transport: http
+url: https://sqladmin.googleapis.com/mcp
+headers:
+  - "Authorization=Bearer ${GOOGLE_CLOUD_ACCESS_TOKEN}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - sqladmin.googleapis.com

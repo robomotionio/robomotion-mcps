@@ -1,0 +1,24 @@
+type: mcp
+name: gcp-chronicle
+title: Google Security Operations (Chronicle)
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: Security
+summary: Google's managed remote MCP server for Google Security Operations
+  (Chronicle). Tools for SIEM search, detections, alerts, cases, IoC lookups,
+  and threat intelligence over your SecOps tenant. Rides Robomotion credproxy —
+  the Google Cloud access token is swapped into the Authorization header at
+  egress; the sandbox sees only a placeholder.
+source_url: https://docs.cloud.google.com/chronicle/docs/reference/mcp
+tags: [google-cloud, chronicle, secops, security, siem, detections, threat-intel]
+transport: http
+url: https://chronicle.${CHRONICLE_REGION}.rep.googleapis.com/mcp
+headers:
+  - "Authorization=Bearer ${GOOGLE_CLOUD_ACCESS_TOKEN}"
+timeout: 300
+# Destination host is region-specific (the URL host carries a ${CHRONICLE_REGION}
+# placeholder bound at hire time), so no fixed egress allowlist ships here. The
+# deskbot binds the placeholder to the configured region host; otherwise the
+# warn-mode rollout flag (CREDPROXY_DEST_ENFORCE) keeps it working until backfilled.
+egress_hosts: []

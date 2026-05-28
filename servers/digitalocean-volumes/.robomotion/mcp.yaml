@@ -1,0 +1,22 @@
+type: mcp
+name: digitalocean-volumes
+title: DigitalOcean Volumes
+author: DigitalOcean
+version: 1.0.0
+license: MIT
+category: Storage
+summary: DigitalOcean's hosted MCP server for block storage. Tools to manage
+  block storage volumes and volume snapshots — create, resize, attach, detach,
+  and delete. Rides Robomotion credproxy — the personal access token is swapped
+  into the Authorization header at egress; the sandbox sees only a placeholder.
+source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+tags: [digitalocean, storage, volumes, block-storage, snapshots, cloud]
+transport: http
+url: https://volumes.mcp.digitalocean.com/mcp
+headers:
+  - "Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - volumes.mcp.digitalocean.com

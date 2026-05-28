@@ -1,0 +1,22 @@
+type: mcp
+name: digitalocean-dedicated-inference
+title: DigitalOcean Dedicated Inference
+author: DigitalOcean
+version: 1.0.0
+license: MIT
+category: AI / ML
+summary: DigitalOcean's hosted Dedicated Inference MCP server. Tools to manage
+  Dedicated Inference instances for GPU-accelerated model serving. Rides
+  Robomotion credproxy — the personal access token is swapped into the
+  Authorization header at egress; the sandbox sees only a placeholder.
+source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+tags: [digitalocean, ai, ml, inference, gpu, model-serving, http]
+transport: http
+url: https://dedicated-inference.mcp.digitalocean.com/mcp
+headers:
+  - "Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - dedicated-inference.mcp.digitalocean.com

@@ -1,0 +1,24 @@
+type: mcp
+name: gcp-compute-engine
+title: Compute Engine (Google Cloud)
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: DevOps
+summary: Google Cloud's managed Compute Engine remote MCP server. Tools for
+  managing virtual machine instances, disks, images, networks, and related
+  compute resources. Connects over streamable HTTP to Google's fixed endpoint;
+  the OAuth access token (from gcloud Application Default Credentials or a
+  service account) is swapped into the Authorization header at egress by
+  credproxy, so the sandbox only sees a placeholder.
+source_url: https://docs.cloud.google.com/compute/docs/reference/mcp
+tags: [google-cloud, gcp, compute-engine, vms, instances, disks, networking, devops]
+transport: http
+url: https://compute.googleapis.com/mcp
+headers:
+  - "Authorization=Bearer ${GCP_ACCESS_TOKEN}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - compute.googleapis.com

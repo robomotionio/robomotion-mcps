@@ -1,0 +1,23 @@
+type: mcp
+name: gcp-gke
+title: Kubernetes Engine (GKE, Google Cloud)
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: DevOps
+summary: Google Cloud's fully managed remote GKE MCP server. Tools to inspect and
+  manage Kubernetes Engine clusters, node pools, and workloads over streamable
+  HTTP. Rides Robomotion credproxy — the Google Cloud OAuth access token is
+  swapped into the Authorization header at egress; the sandbox sees only a
+  placeholder.
+source_url: https://docs.cloud.google.com/kubernetes-engine/docs/reference/mcp
+tags: [gke, kubernetes, google-cloud, gcp, devops, containers, clusters]
+transport: http
+url: https://container.googleapis.com/mcp
+headers:
+  - "Authorization=Bearer ${GCP_ACCESS_TOKEN}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - container.googleapis.com

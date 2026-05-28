@@ -1,0 +1,23 @@
+type: mcp
+name: google-maps-code-assist
+title: Google Maps Platform Code Assist
+author: Google
+version: 1.0.0
+license: ISC
+category: Developer Tools
+summary: Google's official Maps Platform Code Assist toolkit. Grounds your AI
+  coding assistant in the latest Maps Platform documentation, official code
+  samples, and expert-authored best practices so generated Maps code is accurate
+  and current. Runs as a stdio subprocess inside the agent sandbox via npx; the
+  documentation-retrieval tools need no API key, so no credentials enter the
+  container.
+source_url: https://github.com/googlemaps/platform-ai/tree/main/packages/code-assist
+tags: [google-maps, maps-platform, code-assist, documentation, developer-tools, stdio]
+transport: stdio
+command: npx
+args: ["-y", "@googlemaps/code-assist-mcp@latest"]
+timeout: 300
+# Upstream API host the bundled server reaches for documentation retrieval.
+# credstdio spawns it host-side; no credentials are injected for this server.
+egress_hosts:
+  - mapscodeassist.googleapis.com

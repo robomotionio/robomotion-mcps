@@ -7,11 +7,18 @@ license: MIT
 category: Developer Tools
 summary: Microsoft's Azure DevOps MCP server. Tools for work items, repositories,
   pull requests, pipelines, test plans, and wikis across an Azure DevOps
-  organization. Runs as a local stdio subprocess via npx; the personal access
-  token is held host-side by the credstdio bridge.
+  organization. Runs as a stdio subprocess via npx inside the agent sandbox;
+  the personal access token enters the container only as a credproxy
+  placeholder, swapped for the real token at TLS egress.
 source_url: https://github.com/microsoft/azure-devops-mcp
 tags: [azure-devops, microsoft, work-items, repos, pipelines, boards, stdio]
 transport: stdio
 command: npx
 args: ["-y", "@azure-devops/mcp", "${AZURE_DEVOPS_ORG}"]
 timeout: 300
+# Hosts the PAT may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - dev.azure.com
+  - "*.dev.azure.com"
+  - login.microsoftonline.com

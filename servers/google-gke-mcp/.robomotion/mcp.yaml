@@ -1,0 +1,26 @@
+type: mcp
+name: google-gke-mcp
+title: GKE (open-source MCP)
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: DevOps
+summary: Google's open-source GKE MCP server. Tools for Google Kubernetes Engine
+  clusters, node pools, Kubernetes manifests, Cloud Logging queries, and GKE
+  release notes. Runs as a stdio subprocess inside the agent sandbox via the
+  bundled gke-mcp binary; it authenticates with Google Cloud Application Default
+  Credentials supplied host-side by the credstdio bridge, so the sandbox never
+  holds the secret.
+source_url: https://github.com/GoogleCloudPlatform/gke-mcp
+tags: [google, gke, kubernetes, gcp, devops, clusters, k8s, stdio]
+transport: stdio
+command: gke-mcp
+args: []
+timeout: 300
+# Hosts the server may egress to with the bound credentials. credproxy refuses
+# to substitute the placeholder for any other destination (placeholder-replay
+# defense).
+egress_hosts:
+  - container.googleapis.com
+  - logging.googleapis.com
+  - cloudresourcemanager.googleapis.com

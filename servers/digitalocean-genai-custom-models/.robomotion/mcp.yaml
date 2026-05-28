@@ -1,0 +1,23 @@
+type: mcp
+name: digitalocean-genai-custom-models
+title: DigitalOcean GenAI Custom Models
+author: DigitalOcean
+version: 1.0.0
+license: MIT
+category: AI / ML
+summary: DigitalOcean's hosted GenAI Custom Models MCP server. Tools to import,
+  list, update, and delete custom (bring-your-own) models on DigitalOcean's
+  GenAI platform. Rides Robomotion credproxy — the personal access token is
+  swapped into the Authorization header at egress; the sandbox sees only a
+  placeholder.
+source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+tags: [digitalocean, genai, ai, ml, custom-models, models, byom]
+transport: http
+url: https://genai-custom-models.mcp.digitalocean.com/mcp
+headers:
+  - "Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - genai-custom-models.mcp.digitalocean.com

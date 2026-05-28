@@ -1,0 +1,23 @@
+type: mcp
+name: google-analytics
+title: Google Analytics
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: Analytics
+summary: Google's official Google Analytics MCP server. Tools to explore your GA4
+  account and run reports via the Analytics Admin and Data APIs. Runs as a stdio
+  subprocess inside the agent sandbox; the service-account / ADC credentials enter
+  the container only as credproxy placeholders, swapped for the real values at
+  TLS egress, so the sandbox never holds the secret.
+source_url: https://github.com/googleanalytics/google-analytics-mcp
+tags: [google-analytics, ga4, analytics, reporting, admin-api, data-api, stdio]
+transport: stdio
+command: pipx
+args: ["run", "analytics-mcp"]
+timeout: 300
+# Hosts the credentials may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - analyticsadmin.googleapis.com
+  - analyticsdata.googleapis.com

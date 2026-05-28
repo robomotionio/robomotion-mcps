@@ -1,0 +1,28 @@
+type: mcp
+name: azure-mcp
+title: Azure MCP Server
+author: Microsoft
+version: 1.0.0
+license: MIT
+category: DevOps
+summary: Microsoft's official Azure MCP server. Tools spanning 40+ Azure
+  services — Resource Groups, Storage, Cosmos DB, Azure SQL, Monitor/Log
+  Analytics, Key Vault, AKS, and more — built on the Azure SDK. Runs as a
+  stdio subprocess inside the agent sandbox; the Entra service-principal
+  credentials enter the container only as credproxy placeholders, swapped for
+  the real values at TLS egress, so the sandbox never holds the secret.
+source_url: https://github.com/microsoft/mcp/tree/main/servers/Azure.Mcp.Server
+tags: [azure, microsoft, devops, cloud, storage, cosmos-db, sql, monitor, key-vault, stdio]
+transport: stdio
+command: npx
+args: ["-y", "@azure/mcp@latest", "server", "start"]
+timeout: 300
+# Hosts the credentials may egress to. The Azure Identity SDK authenticates
+# against Entra ID, and the service tools call the Azure Resource Manager and
+# per-service data-plane endpoints (*.azure.com etc.). Because the data-plane
+# host set is open-ended across 40+ services, only the fixed auth + control
+# plane hosts are pinned; the warn-mode rollout flag (CREDPROXY_DEST_ENFORCE)
+# keeps data-plane calls working until backfilled.
+egress_hosts:
+  - login.microsoftonline.com
+  - management.azure.com

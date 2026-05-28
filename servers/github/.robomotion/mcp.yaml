@@ -16,3 +16,7 @@ url: https://api.githubcopilot.com/mcp/
 headers:
   - "Authorization=Bearer ${GITHUB_PERSONAL_ACCESS_TOKEN}"
 timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - api.githubcopilot.com

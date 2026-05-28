@@ -1,11 +1,60 @@
 schema_version: 1
 servers:
+- name: azure-aks
+  path: servers/azure-aks
+  title: Azure Kubernetes Service (AKS)
+  summary: Microsoft's AKS MCP server. Tools to inspect and operate Azure Kubernetes Service clusters, node pools, networking,
+    and diagnostics via the Azure Resource Manager and kubectl. Runs as a stdio subprocess (official ghcr.io/azure/aks-mcp
+    container) inside the agent sandbox; the Azure service principal credentials enter the container only as credproxy placeholders,
+    swapped for the real values at TLS egress, so the sandbox never holds the secret.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://github.com/Azure/aks-mcp
+  license: MIT
+  category: DevOps
+  tags:
+  - azure
+  - aks
+  - kubernetes
+  - k8s
+  - devops
+  - cloud
+  - containers
+  - stdio
+  transport: stdio
+  command: docker
+  args:
+  - run
+  - -i
+  - --rm
+  - ghcr.io/azure/aks-mcp:latest
+  - --transport
+  - stdio
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - management.azure.com
+  - login.microsoftonline.com
+  env:
+    required:
+    - AZURE_CLIENT_ID
+    - AZURE_CLIENT_SECRET
+    - AZURE_TENANT_ID
+    optional:
+    - AZURE_SUBSCRIPTION_ID
+  content_hash: e06ff061a3da
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.optional
+  - env.required
 - name: azure-devops
   path: servers/azure-devops
   title: Azure DevOps
   summary: Microsoft's Azure DevOps MCP server. Tools for work items, repositories, pull requests, pipelines, test plans,
-    and wikis across an Azure DevOps organization. Runs as a local stdio subprocess via npx; the personal access token is
-    held host-side by the credstdio bridge.
+    and wikis across an Azure DevOps organization. Runs as a stdio subprocess via npx inside the agent sandbox; the personal
+    access token enters the container only as a credproxy placeholder, swapped for the real token at TLS egress.
   version: 1.0.0
   author: Microsoft
   source_url: https://github.com/microsoft/azure-devops-mcp
@@ -28,23 +77,148 @@ servers:
   url: ''
   headers: []
   timeout: 300
+  egress_hosts:
+  - dev.azure.com
+  - '*.dev.azure.com'
+  - login.microsoftonline.com
   env:
     required:
     - AZURE_DEVOPS_ORG
     optional:
     - AZURE_DEVOPS_PAT
-  content_hash: 9f9e6e9163ed
+  content_hash: cdb97625ac65
   files:
   - .robomotion/mcp.yaml
   - MCP.md
   - env.optional
   - env.required
-- name: digitalocean
-  path: servers/digitalocean
-  title: DigitalOcean (Remote)
-  summary: DigitalOcean's hosted MCP server for App Platform — deploy, inspect, and manage apps, deployments, and databases.
-    Rides Robomotion credproxy (the API token is swapped into the Authorization header at TLS egress; the sandbox only ever
-    sees a placeholder).
+- name: azure-mcp
+  path: servers/azure-mcp
+  title: Azure MCP Server
+  summary: Microsoft's official Azure MCP server. Tools spanning 40+ Azure services — Resource Groups, Storage, Cosmos DB,
+    Azure SQL, Monitor/Log Analytics, Key Vault, AKS, and more — built on the Azure SDK. Runs as a stdio subprocess inside
+    the agent sandbox; the Entra service-principal credentials enter the container only as credproxy placeholders, swapped
+    for the real values at TLS egress, so the sandbox never holds the secret.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://github.com/microsoft/mcp/tree/main/servers/Azure.Mcp.Server
+  license: MIT
+  category: DevOps
+  tags:
+  - azure
+  - microsoft
+  - devops
+  - cloud
+  - storage
+  - cosmos-db
+  - sql
+  - monitor
+  - key-vault
+  - stdio
+  transport: stdio
+  command: npx
+  args:
+  - -y
+  - '@azure/mcp@latest'
+  - server
+  - start
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - login.microsoftonline.com
+  - management.azure.com
+  env:
+    required:
+    - AZURE_TENANT_ID
+    - AZURE_CLIENT_ID
+    - AZURE_CLIENT_SECRET
+    optional: []
+  content_hash: f3cc5e81064a
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: azure-resource-manager
+  path: servers/azure-resource-manager
+  title: Azure Resource Manager
+  summary: Microsoft's Azure Resource Manager (ARM) MCP Server (preview), a cloud-hosted endpoint that gives agents first-class
+    access to Azure infrastructure — generate, validate, and run Azure Resource Graph queries and deploy or manage ARM template
+    deployments across all resource types. Authentication is interactive Microsoft Entra ID OAuth performed by the MCP client
+    (no static token is bound), so no credproxy header placeholder ships; the agent never holds a long-lived secret.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://github.com/Azure/Azure-Resource-Manager-MCP
+  license: MIT
+  category: DevOps
+  tags:
+  - azure
+  - microsoft
+  - devops
+  - cloud
+  - arm
+  - resource-graph
+  - deployments
+  - entra
+  - oauth
+  transport: http
+  command: ''
+  args: []
+  url: https://mcp.management.azure.com
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - mcp.management.azure.com
+  env:
+    required: []
+    optional: []
+  content_hash: 15c03ee8d41b
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+- name: digitalocean-accounts
+  path: servers/digitalocean-accounts
+  title: DigitalOcean Accounts
+  summary: DigitalOcean's hosted "accounts" MCP server. Tools to get information about your DigitalOcean account, billing,
+    balance, invoices, and SSH keys. Rides Robomotion credproxy — the personal access token is swapped into the Authorization
+    header at egress; the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: DigitalOcean
+  source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+  license: MIT
+  category: DevOps
+  tags:
+  - digitalocean
+  - devops
+  - cloud
+  - account
+  - billing
+  - invoices
+  - ssh-keys
+  transport: http
+  command: ''
+  args: []
+  url: https://accounts.mcp.digitalocean.com/mcp
+  headers:
+  - Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - accounts.mcp.digitalocean.com
+  env:
+    required:
+    - DIGITALOCEAN_API_TOKEN
+    optional: []
+  content_hash: a1f38aaf9477
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: digitalocean-apps
+  path: servers/digitalocean-apps
+  title: DigitalOcean App Platform
+  summary: DigitalOcean's hosted MCP server for App Platform. Tools to manage applications, including deployments and configurations.
+    Rides Robomotion credproxy — the personal access token is swapped into the Authorization header at egress; the sandbox
+    sees only a placeholder.
   version: 1.0.0
   author: DigitalOcean
   source_url: https://github.com/digitalocean-labs/mcp-digitalocean
@@ -55,7 +229,7 @@ servers:
   - devops
   - cloud
   - apps
-  - databases
+  - app-platform
   - deploy
   transport: http
   command: ''
@@ -64,11 +238,451 @@ servers:
   headers:
   - Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}
   timeout: 300
+  egress_hosts:
+  - apps.mcp.digitalocean.com
   env:
     required:
     - DIGITALOCEAN_API_TOKEN
     optional: []
-  content_hash: 5a9144cd369c
+  content_hash: fc53fb69e01a
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: digitalocean-databases
+  path: servers/digitalocean-databases
+  title: DigitalOcean Databases
+  summary: DigitalOcean's hosted "databases" MCP server. Tools to provision, manage, and monitor managed database clusters
+    (PostgreSQL, MySQL, Redis, and more). Rides Robomotion credproxy — the personal access token is swapped into the Authorization
+    header at egress; the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: DigitalOcean
+  source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+  license: MIT
+  category: DevOps
+  tags:
+  - digitalocean
+  - devops
+  - cloud
+  - databases
+  - postgres
+  - mysql
+  - redis
+  transport: http
+  command: ''
+  args: []
+  url: https://databases.mcp.digitalocean.com/mcp
+  headers:
+  - Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - databases.mcp.digitalocean.com
+  env:
+    required:
+    - DIGITALOCEAN_API_TOKEN
+    optional: []
+  content_hash: 5f8469369142
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: digitalocean-dedicated-inference
+  path: servers/digitalocean-dedicated-inference
+  title: DigitalOcean Dedicated Inference
+  summary: DigitalOcean's hosted Dedicated Inference MCP server. Tools to manage Dedicated Inference instances for GPU-accelerated
+    model serving. Rides Robomotion credproxy — the personal access token is swapped into the Authorization header at egress;
+    the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: DigitalOcean
+  source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+  license: MIT
+  category: AI / ML
+  tags:
+  - digitalocean
+  - ai
+  - ml
+  - inference
+  - gpu
+  - model-serving
+  - http
+  transport: http
+  command: ''
+  args: []
+  url: https://dedicated-inference.mcp.digitalocean.com/mcp
+  headers:
+  - Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - dedicated-inference.mcp.digitalocean.com
+  env:
+    required:
+    - DIGITALOCEAN_API_TOKEN
+    optional: []
+  content_hash: db02840abb27
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: digitalocean-docr
+  path: servers/digitalocean-docr
+  title: DigitalOcean Container Registry
+  summary: DigitalOcean's hosted "docr" MCP server. Tools to manage Container Registry repositories, tags, manifests, and
+    garbage collection. Rides Robomotion credproxy — the personal access token is swapped into the Authorization header at
+    egress; the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: DigitalOcean
+  source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+  license: MIT
+  category: DevOps
+  tags:
+  - digitalocean
+  - devops
+  - container-registry
+  - docr
+  - docker
+  - registry
+  - deploy
+  transport: http
+  command: ''
+  args: []
+  url: https://docr.mcp.digitalocean.com/mcp
+  headers:
+  - Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - docr.mcp.digitalocean.com
+  env:
+    required:
+    - DIGITALOCEAN_API_TOKEN
+    optional: []
+  content_hash: e693c8fa9c2d
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: digitalocean-docs
+  path: servers/digitalocean-docs
+  title: DigitalOcean Docs
+  summary: DigitalOcean's hosted documentation MCP server. Search and retrieve DigitalOcean's public product documentation
+    directly from the agent. No API token is required — the endpoint is public, so no credential ever enters the sandbox.
+  version: 1.0.0
+  author: DigitalOcean
+  source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+  license: MIT
+  category: Developer Tools
+  tags:
+  - digitalocean
+  - docs
+  - documentation
+  - search
+  - devops
+  - http
+  transport: http
+  command: ''
+  args: []
+  url: https://docs.mcp.digitalocean.com/mcp
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - docs.mcp.digitalocean.com
+  env:
+    required: []
+    optional: []
+  content_hash: aac0e5066d93
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+- name: digitalocean-doks
+  path: servers/digitalocean-doks
+  title: DigitalOcean Kubernetes (DOKS)
+  summary: DigitalOcean's hosted MCP server for DOKS. Tools to manage DigitalOcean Kubernetes clusters and node pools. Rides
+    Robomotion credproxy — the personal access token is swapped into the Authorization header at egress; the sandbox sees
+    only a placeholder.
+  version: 1.0.0
+  author: DigitalOcean
+  source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+  license: MIT
+  category: DevOps
+  tags:
+  - digitalocean
+  - devops
+  - kubernetes
+  - doks
+  - clusters
+  - node-pools
+  transport: http
+  command: ''
+  args: []
+  url: https://doks.mcp.digitalocean.com/mcp
+  headers:
+  - Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - doks.mcp.digitalocean.com
+  env:
+    required:
+    - DIGITALOCEAN_API_TOKEN
+    optional: []
+  content_hash: c1e7285b9a1d
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: digitalocean-droplets
+  path: servers/digitalocean-droplets
+  title: DigitalOcean Droplets
+  summary: DigitalOcean's hosted "droplets" MCP server. Tools to create, manage, resize, snapshot, and monitor droplets (virtual
+    machines) on DigitalOcean. Rides Robomotion credproxy — the personal access token is swapped into the Authorization header
+    at egress; the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: DigitalOcean
+  source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+  license: MIT
+  category: DevOps
+  tags:
+  - digitalocean
+  - devops
+  - cloud
+  - droplets
+  - vm
+  - compute
+  - snapshots
+  transport: http
+  command: ''
+  args: []
+  url: https://droplets.mcp.digitalocean.com/mcp
+  headers:
+  - Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - droplets.mcp.digitalocean.com
+  env:
+    required:
+    - DIGITALOCEAN_API_TOKEN
+    optional: []
+  content_hash: d1b63b8fdaa2
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: digitalocean-functions
+  path: servers/digitalocean-functions
+  title: DigitalOcean Functions
+  summary: DigitalOcean's hosted MCP server for serverless Functions. Tools to manage function namespaces, actions, packages,
+    triggers, and activations. Rides Robomotion credproxy — the personal access token is swapped into the Authorization header
+    at egress; the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: DigitalOcean
+  source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+  license: MIT
+  category: DevOps
+  tags:
+  - digitalocean
+  - devops
+  - serverless
+  - functions
+  - namespaces
+  - triggers
+  - cloud
+  transport: http
+  command: ''
+  args: []
+  url: https://functions.mcp.digitalocean.com/mcp
+  headers:
+  - Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - functions.mcp.digitalocean.com
+  env:
+    required:
+    - DIGITALOCEAN_API_TOKEN
+    optional: []
+  content_hash: aa505aecd965
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: digitalocean-genai-batchinference
+  path: servers/digitalocean-genai-batchinference
+  title: DigitalOcean GenAI Batch Inference
+  summary: DigitalOcean's hosted GenAI Batch Inference MCP server. Tools to create, manage, and monitor batch inference jobs
+    for asynchronous bulk AI processing. Rides Robomotion credproxy — the DigitalOcean personal access token is swapped into
+    the Authorization header at egress; the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: DigitalOcean
+  source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+  license: MIT
+  category: AI / ML
+  tags:
+  - digitalocean
+  - genai
+  - ai
+  - ml
+  - batch-inference
+  - async
+  - jobs
+  transport: http
+  command: ''
+  args: []
+  url: https://genai-batchinference.mcp.digitalocean.com/mcp
+  headers:
+  - Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - genai-batchinference.mcp.digitalocean.com
+  env:
+    required:
+    - DIGITALOCEAN_API_TOKEN
+    optional: []
+  content_hash: 7cd6ba14e3f8
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: digitalocean-genai-custom-models
+  path: servers/digitalocean-genai-custom-models
+  title: DigitalOcean GenAI Custom Models
+  summary: DigitalOcean's hosted GenAI Custom Models MCP server. Tools to import, list, update, and delete custom (bring-your-own)
+    models on DigitalOcean's GenAI platform. Rides Robomotion credproxy — the personal access token is swapped into the Authorization
+    header at egress; the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: DigitalOcean
+  source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+  license: MIT
+  category: AI / ML
+  tags:
+  - digitalocean
+  - genai
+  - ai
+  - ml
+  - custom-models
+  - models
+  - byom
+  transport: http
+  command: ''
+  args: []
+  url: https://genai-custom-models.mcp.digitalocean.com/mcp
+  headers:
+  - Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - genai-custom-models.mcp.digitalocean.com
+  env:
+    required:
+    - DIGITALOCEAN_API_TOKEN
+    optional: []
+  content_hash: 0fc5a8d953f7
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: digitalocean-genai-evaluation
+  path: servers/digitalocean-genai-evaluation
+  title: DigitalOcean GenAI Evaluation
+  summary: DigitalOcean's hosted GenAI Evaluation MCP server. Tools to manage and run evaluation workflows on DigitalOcean's
+    GenAI platform. Rides Robomotion credproxy — the personal access token is swapped into the Authorization header at egress;
+    the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: DigitalOcean
+  source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+  license: MIT
+  category: AI / ML
+  tags:
+  - digitalocean
+  - genai
+  - evaluation
+  - ai
+  - ml
+  - llm
+  - workflows
+  transport: http
+  command: ''
+  args: []
+  url: https://genai-evaluation.mcp.digitalocean.com/mcp
+  headers:
+  - Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - genai-evaluation.mcp.digitalocean.com
+  env:
+    required:
+    - DIGITALOCEAN_API_TOKEN
+    optional: []
+  content_hash: 5624525d0687
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: digitalocean-inference-modelcatalog
+  path: servers/digitalocean-inference-modelcatalog
+  title: DigitalOcean Inference Model Catalog
+  summary: DigitalOcean's hosted Inference Model Catalog MCP server. Tools to browse the Inference model catalog, search for
+    models, and fetch model cards. Rides Robomotion credproxy — the personal access token is swapped into the Authorization
+    header at egress; the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: DigitalOcean
+  source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+  license: MIT
+  category: AI / ML
+  tags:
+  - digitalocean
+  - inference
+  - models
+  - model-catalog
+  - ai
+  - ml
+  transport: http
+  command: ''
+  args: []
+  url: https://inference-modelcatalog.mcp.digitalocean.com/mcp
+  headers:
+  - Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - inference-modelcatalog.mcp.digitalocean.com
+  env:
+    required:
+    - DIGITALOCEAN_API_TOKEN
+    optional: []
+  content_hash: 4dcc9dc29f6f
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: digitalocean-insights
+  path: servers/digitalocean-insights
+  title: DigitalOcean Insights
+  summary: DigitalOcean's hosted "insights" MCP server. Tools to monitor your resources and endpoints and alert you when they're
+    slow, unavailable, or their SSL certificates are expiring. Rides Robomotion credproxy — the personal access token is swapped
+    into the Authorization header at egress; the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: DigitalOcean
+  source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+  license: MIT
+  category: DevOps
+  tags:
+  - digitalocean
+  - devops
+  - cloud
+  - monitoring
+  - alerting
+  - uptime
+  - ssl
+  - insights
+  transport: http
+  command: ''
+  args: []
+  url: https://insights.mcp.digitalocean.com/mcp
+  headers:
+  - Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - insights.mcp.digitalocean.com
+  env:
+    required:
+    - DIGITALOCEAN_API_TOKEN
+    optional: []
+  content_hash: 598766dd76a9
   files:
   - .robomotion/mcp.yaml
   - MCP.md
@@ -77,8 +691,8 @@ servers:
   path: servers/digitalocean-local
   title: DigitalOcean (Local)
   summary: DigitalOcean's MCP server run locally via npx. Same App Platform + database tooling as the remote server, but spawned
-    as a stdio subprocess. Runs through the Robomotion credstdio bridge — the real API token is held host-side only; the sandboxed
-    agent attaches over a loopback socket and never receives the secret.
+    as a stdio subprocess inside the agent sandbox using the bundled runtimes. The API token enters the container only as
+    a credproxy placeholder; credproxy swaps it for the real token at TLS egress, so the sandbox never holds the secret.
   version: 1.0.0
   author: DigitalOcean
   source_url: https://github.com/digitalocean-labs/mcp-digitalocean
@@ -101,11 +715,803 @@ servers:
   url: ''
   headers: []
   timeout: 300
+  egress_hosts:
+  - api.digitalocean.com
   env:
     required:
     - DIGITALOCEAN_API_TOKEN
     optional: []
-  content_hash: 547e826dfe58
+  content_hash: 4318059ef12a
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: digitalocean-marketplace
+  path: servers/digitalocean-marketplace
+  title: DigitalOcean Marketplace
+  summary: DigitalOcean's hosted Marketplace MCP server. Tools to discover and manage DigitalOcean Marketplace applications.
+    Rides Robomotion credproxy — the personal access token is swapped into the Authorization header at egress; the sandbox
+    sees only a placeholder.
+  version: 1.0.0
+  author: DigitalOcean
+  source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+  license: MIT
+  category: DevOps
+  tags:
+  - digitalocean
+  - devops
+  - cloud
+  - marketplace
+  - apps
+  - deploy
+  transport: http
+  command: ''
+  args: []
+  url: https://marketplace.mcp.digitalocean.com/mcp
+  headers:
+  - Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - marketplace.mcp.digitalocean.com
+  env:
+    required:
+    - DIGITALOCEAN_API_TOKEN
+    optional: []
+  content_hash: 13ab68f0e2a0
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: digitalocean-networking
+  path: servers/digitalocean-networking
+  title: DigitalOcean Networking
+  summary: DigitalOcean's hosted "networking" MCP server. Tools to manage domains, DNS records, certificates, firewalls, load
+    balancers, reserved IPs, BYOIP prefixes, VPCs, and CDNs. Rides Robomotion credproxy — the personal access token is swapped
+    into the Authorization header at egress; the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: DigitalOcean
+  source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+  license: MIT
+  category: DevOps
+  tags:
+  - digitalocean
+  - devops
+  - cloud
+  - networking
+  - dns
+  - firewall
+  - load-balancer
+  - vpc
+  - cdn
+  transport: http
+  command: ''
+  args: []
+  url: https://networking.mcp.digitalocean.com/mcp
+  headers:
+  - Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - networking.mcp.digitalocean.com
+  env:
+    required:
+    - DIGITALOCEAN_API_TOKEN
+    optional: []
+  content_hash: f79fc6416047
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: digitalocean-nfs
+  path: servers/digitalocean-nfs
+  title: DigitalOcean NFS
+  summary: DigitalOcean's hosted MCP server for NFS. Tools to manage NFS file shares and file share snapshots. Rides Robomotion
+    credproxy — the DigitalOcean personal access token is swapped into the Authorization header at egress; the sandbox sees
+    only a placeholder.
+  version: 1.0.0
+  author: DigitalOcean
+  source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+  license: MIT
+  category: Storage
+  tags:
+  - digitalocean
+  - storage
+  - nfs
+  - file-shares
+  - snapshots
+  - cloud
+  transport: http
+  command: ''
+  args: []
+  url: https://nfs.mcp.digitalocean.com/mcp
+  headers:
+  - Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - nfs.mcp.digitalocean.com
+  env:
+    required:
+    - DIGITALOCEAN_API_TOKEN
+    optional: []
+  content_hash: 23966671e9d6
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: digitalocean-spaces
+  path: servers/digitalocean-spaces
+  title: DigitalOcean Spaces
+  summary: DigitalOcean's hosted Spaces MCP server. Tools for Spaces object storage buckets and Spaces access keys for S3-compatible
+    storage. Rides Robomotion credproxy — the DigitalOcean personal access token is swapped into the Authorization header
+    at egress; the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: DigitalOcean
+  source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+  license: MIT
+  category: Storage
+  tags:
+  - digitalocean
+  - storage
+  - spaces
+  - object-storage
+  - s3
+  - buckets
+  transport: http
+  command: ''
+  args: []
+  url: https://spaces.mcp.digitalocean.com/mcp
+  headers:
+  - Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - spaces.mcp.digitalocean.com
+  env:
+    required:
+    - DIGITALOCEAN_API_TOKEN
+    optional: []
+  content_hash: 4f2606959ddd
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: digitalocean-volumes
+  path: servers/digitalocean-volumes
+  title: DigitalOcean Volumes
+  summary: DigitalOcean's hosted MCP server for block storage. Tools to manage block storage volumes and volume snapshots
+    — create, resize, attach, detach, and delete. Rides Robomotion credproxy — the personal access token is swapped into the
+    Authorization header at egress; the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: DigitalOcean
+  source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+  license: MIT
+  category: Storage
+  tags:
+  - digitalocean
+  - storage
+  - volumes
+  - block-storage
+  - snapshots
+  - cloud
+  transport: http
+  command: ''
+  args: []
+  url: https://volumes.mcp.digitalocean.com/mcp
+  headers:
+  - Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - volumes.mcp.digitalocean.com
+  env:
+    required:
+    - DIGITALOCEAN_API_TOKEN
+    optional: []
+  content_hash: eb477ff42e07
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: gcp-alloydb
+  path: servers/gcp-alloydb
+  title: AlloyDB for PostgreSQL (Google Cloud)
+  summary: Google Cloud's managed remote MCP server for AlloyDB for PostgreSQL. Tools to explore clusters and instances, run
+    SQL, and work with AlloyDB AI features. Rides Robomotion credproxy — the Google Cloud access token is swapped into the
+    Authorization header at egress; the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: Google
+  source_url: https://docs.cloud.google.com/alloydb/docs/ai/use-alloydb-mcp
+  license: Apache-2.0
+  category: Databases
+  tags:
+  - google-cloud
+  - gcp
+  - alloydb
+  - postgresql
+  - database
+  - sql
+  - ai
+  transport: http
+  command: ''
+  args: []
+  url: https://alloydb.googleapis.com/mcp
+  headers:
+  - Authorization=Bearer ${GOOGLE_CLOUD_ACCESS_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - alloydb.googleapis.com
+  env:
+    required:
+    - GOOGLE_CLOUD_ACCESS_TOKEN
+    optional: []
+  content_hash: 8a1ca2885331
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: gcp-bigquery
+  path: servers/gcp-bigquery
+  title: BigQuery (Google Cloud)
+  summary: Google Cloud's fully managed remote BigQuery MCP server. Tools to list datasets and tables, inspect schemas, and
+    run SQL queries against BigQuery over streamable HTTP. Rides Robomotion credproxy — the Google Cloud OAuth access token
+    is swapped into the Authorization header at egress; the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: Google
+  source_url: https://docs.cloud.google.com/bigquery/docs/use-bigquery-mcp
+  license: Apache-2.0
+  category: Databases
+  tags:
+  - bigquery
+  - google-cloud
+  - gcp
+  - databases
+  - sql
+  - analytics
+  - data-warehouse
+  transport: http
+  command: ''
+  args: []
+  url: https://bigquery.googleapis.com/mcp
+  headers:
+  - Authorization=Bearer ${GCP_ACCESS_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - bigquery.googleapis.com
+  env:
+    required:
+    - GCP_ACCESS_TOKEN
+    optional: []
+  content_hash: 34a11dbc546a
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: gcp-bigtable
+  path: servers/gcp-bigtable
+  title: Bigtable (Google Cloud)
+  summary: Google Cloud's managed remote MCP server for Cloud Bigtable. Tools to manage instances, clusters, tables, and IAM,
+    plus read and query data through the Bigtable Admin API. Rides Robomotion credproxy — the Google Cloud OAuth access token
+    is swapped into the Authorization header at egress; the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: Google
+  source_url: https://docs.cloud.google.com/bigtable/docs/use-bigtable-mcp
+  license: Apache-2.0
+  category: Databases
+  tags:
+  - google-cloud
+  - gcp
+  - bigtable
+  - database
+  - nosql
+  - wide-column
+  - http
+  transport: http
+  command: ''
+  args: []
+  url: https://bigtableadmin.googleapis.com/mcp
+  headers:
+  - Authorization=Bearer ${GOOGLE_CLOUD_ACCESS_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - bigtableadmin.googleapis.com
+  env:
+    required:
+    - GOOGLE_CLOUD_ACCESS_TOKEN
+    optional: []
+  content_hash: 5eca693e5ebe
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: gcp-chronicle
+  path: servers/gcp-chronicle
+  title: Google Security Operations (Chronicle)
+  summary: Google's managed remote MCP server for Google Security Operations (Chronicle). Tools for SIEM search, detections,
+    alerts, cases, IoC lookups, and threat intelligence over your SecOps tenant. Rides Robomotion credproxy — the Google Cloud
+    access token is swapped into the Authorization header at egress; the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: Google
+  source_url: https://docs.cloud.google.com/chronicle/docs/reference/mcp
+  license: Apache-2.0
+  category: Security
+  tags:
+  - google-cloud
+  - chronicle
+  - secops
+  - security
+  - siem
+  - detections
+  - threat-intel
+  transport: http
+  command: ''
+  args: []
+  url: https://chronicle.${CHRONICLE_REGION}.rep.googleapis.com/mcp
+  headers:
+  - Authorization=Bearer ${GOOGLE_CLOUD_ACCESS_TOKEN}
+  timeout: 300
+  egress_hosts: []
+  env:
+    required:
+    - GOOGLE_CLOUD_ACCESS_TOKEN
+    - CHRONICLE_REGION
+    optional: []
+  content_hash: 46e03adce3d5
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: gcp-cloud-run
+  path: servers/gcp-cloud-run
+  title: Cloud Run (Google Cloud)
+  summary: Google Cloud's managed remote MCP server for Cloud Run. Tools to deploy, inspect, and manage Cloud Run services,
+    revisions, and jobs via the Cloud Run Admin API. Rides Robomotion credproxy — the Google Cloud access token is swapped
+    into the Authorization header at egress and the sandbox sees only a placeholder, so the secret never enters the container.
+  version: 1.0.0
+  author: Google
+  source_url: https://docs.cloud.google.com/run/docs/reference/mcp
+  license: Apache-2.0
+  category: DevOps
+  tags:
+  - google-cloud
+  - gcp
+  - cloud-run
+  - devops
+  - deploy
+  - serverless
+  - containers
+  transport: http
+  command: ''
+  args: []
+  url: https://run.googleapis.com/mcp
+  headers:
+  - Authorization=Bearer ${GOOGLE_CLOUD_ACCESS_TOKEN}
+  - x-goog-user-project=${GOOGLE_CLOUD_PROJECT}
+  timeout: 300
+  egress_hosts:
+  - run.googleapis.com
+  env:
+    required:
+    - GOOGLE_CLOUD_ACCESS_TOKEN
+    - GOOGLE_CLOUD_PROJECT
+    optional: []
+  content_hash: e5f9a3d54b49
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: gcp-cloud-storage
+  path: servers/gcp-cloud-storage
+  title: Cloud Storage (Google Cloud)
+  summary: Google Cloud's managed remote MCP server for Cloud Storage. Tools for buckets and objects — list, read, write,
+    and manage storage resources via the Cloud Storage API. Rides Robomotion credproxy — the Google Cloud OAuth2 access token
+    is swapped into the Authorization header at egress; the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: Google
+  source_url: https://docs.cloud.google.com/storage/docs/reference/mcp
+  license: Apache-2.0
+  category: Storage
+  tags:
+  - google-cloud
+  - gcp
+  - cloud-storage
+  - storage
+  - buckets
+  - objects
+  - gcs
+  transport: http
+  command: ''
+  args: []
+  url: https://storage.googleapis.com/storage/mcp
+  headers:
+  - Authorization=Bearer ${GOOGLE_CLOUD_ACCESS_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - storage.googleapis.com
+  env:
+    required:
+    - GOOGLE_CLOUD_ACCESS_TOKEN
+    optional: []
+  content_hash: 3a29e5bfd79a
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: gcp-cloudsql-mysql
+  path: servers/gcp-cloudsql-mysql
+  title: Cloud SQL for MySQL (Google Cloud)
+  summary: Google's managed remote MCP server for Cloud SQL for MySQL. Tools to create, list, and manage MySQL instances and
+    to run SQL through the Cloud SQL Admin API. Rides Robomotion credproxy — the Google Cloud OAuth access token is swapped
+    into the Authorization header at egress to sqladmin.googleapis.com; the sandbox sees only a placeholder and never holds
+    the secret.
+  version: 1.0.0
+  author: Google
+  source_url: https://docs.cloud.google.com/sql/docs/mysql/use-cloudsql-mcp
+  license: Apache-2.0
+  category: Databases
+  tags:
+  - google-cloud
+  - gcp
+  - cloud-sql
+  - mysql
+  - database
+  - sql
+  - oauth
+  transport: http
+  command: ''
+  args: []
+  url: https://sqladmin.googleapis.com/mcp
+  headers:
+  - Authorization=Bearer ${GOOGLE_CLOUD_ACCESS_TOKEN}
+  - x-goog-user-project=${GOOGLE_CLOUD_PROJECT}
+  timeout: 300
+  egress_hosts:
+  - sqladmin.googleapis.com
+  env:
+    required:
+    - GOOGLE_CLOUD_ACCESS_TOKEN
+    - GOOGLE_CLOUD_PROJECT
+    optional: []
+  content_hash: ee66d5f37059
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: gcp-cloudsql-postgres
+  path: servers/gcp-cloudsql-postgres
+  title: Cloud SQL for PostgreSQL (Google Cloud)
+  summary: Google's managed remote MCP server for Cloud SQL for PostgreSQL. Tools to create and manage instances, databases,
+    users, backups, and to run SQL against your Cloud SQL instances via the Cloud SQL Admin API. Rides Robomotion credproxy
+    — the Google Cloud access token is swapped into the Authorization header at egress; the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: Google
+  source_url: https://docs.cloud.google.com/sql/docs/postgres/use-cloudsql-mcp
+  license: Apache-2.0
+  category: Databases
+  tags:
+  - google-cloud
+  - gcp
+  - cloud-sql
+  - postgres
+  - postgresql
+  - database
+  - sql
+  transport: http
+  command: ''
+  args: []
+  url: https://sqladmin.googleapis.com/mcp
+  headers:
+  - Authorization=Bearer ${GOOGLE_CLOUD_ACCESS_TOKEN}
+  - x-goog-user-project=${GOOGLE_CLOUD_PROJECT}
+  timeout: 300
+  egress_hosts:
+  - sqladmin.googleapis.com
+  env:
+    required:
+    - GOOGLE_CLOUD_ACCESS_TOKEN
+    - GOOGLE_CLOUD_PROJECT
+    optional: []
+  content_hash: 103b88d480f2
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: gcp-cloudsql-sqlserver
+  path: servers/gcp-cloudsql-sqlserver
+  title: Cloud SQL for SQL Server (Google Cloud)
+  summary: Google's managed remote MCP server for Cloud SQL for SQL Server. Tools for managing SQL Server instances, databases,
+    users, and operations through the Cloud SQL Admin API. Rides Robomotion credproxy — the Google Cloud OAuth access token
+    (from Application Default Credentials) is swapped into the Authorization header at egress; the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: Google
+  source_url: https://docs.cloud.google.com/sql/docs/sqlserver/use-cloudsql-mcp
+  license: Apache-2.0
+  category: Databases
+  tags:
+  - google-cloud
+  - gcp
+  - cloud-sql
+  - sql-server
+  - database
+  - databases
+  - managed
+  transport: http
+  command: ''
+  args: []
+  url: https://sqladmin.googleapis.com/mcp
+  headers:
+  - Authorization=Bearer ${GOOGLE_CLOUD_ACCESS_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - sqladmin.googleapis.com
+  env:
+    required:
+    - GOOGLE_CLOUD_ACCESS_TOKEN
+    optional: []
+  content_hash: 26bc96f6004a
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: gcp-compute-engine
+  path: servers/gcp-compute-engine
+  title: Compute Engine (Google Cloud)
+  summary: Google Cloud's managed Compute Engine remote MCP server. Tools for managing virtual machine instances, disks, images,
+    networks, and related compute resources. Connects over streamable HTTP to Google's fixed endpoint; the OAuth access token
+    (from gcloud Application Default Credentials or a service account) is swapped into the Authorization header at egress
+    by credproxy, so the sandbox only sees a placeholder.
+  version: 1.0.0
+  author: Google
+  source_url: https://docs.cloud.google.com/compute/docs/reference/mcp
+  license: Apache-2.0
+  category: DevOps
+  tags:
+  - google-cloud
+  - gcp
+  - compute-engine
+  - vms
+  - instances
+  - disks
+  - networking
+  - devops
+  transport: http
+  command: ''
+  args: []
+  url: https://compute.googleapis.com/mcp
+  headers:
+  - Authorization=Bearer ${GCP_ACCESS_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - compute.googleapis.com
+  env:
+    required:
+    - GCP_ACCESS_TOKEN
+    optional: []
+  content_hash: c78cd39dff6b
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: gcp-developer-knowledge
+  path: servers/gcp-developer-knowledge
+  title: Google Developer Knowledge API
+  summary: Google's managed remote MCP server for the Developer Knowledge API. Tools that ground answers in official Google
+    developer and Google Cloud documentation, code samples, and product references. Rides Robomotion credproxy — the Google
+    Cloud API key is swapped into the X-Goog-Api-Key header at egress; the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: Google
+  source_url: https://developers.google.com/knowledge/mcp
+  license: Apache-2.0
+  category: Developer Tools
+  tags:
+  - google
+  - gcp
+  - google-cloud
+  - documentation
+  - knowledge
+  - developer-tools
+  transport: http
+  command: ''
+  args: []
+  url: https://developerknowledge.googleapis.com/mcp
+  headers:
+  - X-Goog-Api-Key=${GOOGLE_API_KEY}
+  timeout: 300
+  egress_hosts:
+  - developerknowledge.googleapis.com
+  env:
+    required:
+    - GOOGLE_API_KEY
+    optional: []
+  content_hash: 4c3ac0a09b7a
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: gcp-firestore
+  path: servers/gcp-firestore
+  title: Firestore (Google Cloud)
+  summary: Google Cloud's managed remote MCP server for Firestore in Native mode. Tools to query, read, and write documents
+    and collections, and to inspect database structure, over the streamable-HTTP transport. Authentication uses OAuth 2.0
+    with IAM; a Google Cloud access token rides Robomotion credproxy — the token is swapped into the Authorization header
+    at egress and the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: Google
+  source_url: https://docs.cloud.google.com/firestore/native/docs/use-firestore-mcp
+  license: Apache-2.0
+  category: Databases
+  tags:
+  - firestore
+  - google-cloud
+  - gcp
+  - database
+  - nosql
+  - documents
+  - http
+  transport: http
+  command: ''
+  args: []
+  url: https://firestore.googleapis.com/mcp
+  headers:
+  - Authorization=Bearer ${GOOGLE_CLOUD_ACCESS_TOKEN}
+  - x-goog-user-project=${GOOGLE_CLOUD_PROJECT}
+  timeout: 300
+  egress_hosts:
+  - firestore.googleapis.com
+  env:
+    required:
+    - GOOGLE_CLOUD_ACCESS_TOKEN
+    - GOOGLE_CLOUD_PROJECT
+    optional: []
+  content_hash: 3efe24a0023a
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: gcp-gke
+  path: servers/gcp-gke
+  title: Kubernetes Engine (GKE, Google Cloud)
+  summary: Google Cloud's fully managed remote GKE MCP server. Tools to inspect and manage Kubernetes Engine clusters, node
+    pools, and workloads over streamable HTTP. Rides Robomotion credproxy — the Google Cloud OAuth access token is swapped
+    into the Authorization header at egress; the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: Google
+  source_url: https://docs.cloud.google.com/kubernetes-engine/docs/reference/mcp
+  license: Apache-2.0
+  category: DevOps
+  tags:
+  - gke
+  - kubernetes
+  - google-cloud
+  - gcp
+  - devops
+  - containers
+  - clusters
+  transport: http
+  command: ''
+  args: []
+  url: https://container.googleapis.com/mcp
+  headers:
+  - Authorization=Bearer ${GCP_ACCESS_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - container.googleapis.com
+  env:
+    required:
+    - GCP_ACCESS_TOKEN
+    optional: []
+  content_hash: 1bd77dd44fc2
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: gcp-maps-grounding-lite
+  path: servers/gcp-maps-grounding-lite
+  title: Google Maps Grounding Lite
+  summary: Google's managed Maps Grounding Lite remote MCP server. Tools to ground model responses in Google Maps data — place
+    search, place details, geocoding, and directions. Rides Robomotion credproxy — the Maps Platform API key is swapped into
+    the X-Goog-Api-Key header at egress; the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: Google
+  source_url: https://developers.google.com/maps/ai/grounding-lite
+  license: Apache-2.0
+  category: Productivity
+  tags:
+  - google
+  - maps
+  - places
+  - geocoding
+  - directions
+  - grounding
+  - location
+  transport: http
+  command: ''
+  args: []
+  url: https://mapstools.googleapis.com/mcp
+  headers:
+  - X-Goog-Api-Key=${GOOGLE_MAPS_API_KEY}
+  timeout: 300
+  egress_hosts:
+  - mapstools.googleapis.com
+  env:
+    required:
+    - GOOGLE_MAPS_API_KEY
+    optional: []
+  content_hash: a313e954a82d
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: gcp-resource-manager
+  path: servers/gcp-resource-manager
+  title: Cloud Resource Manager (Google Cloud)
+  summary: Google Cloud's managed Cloud Resource Manager remote MCP server. Tools for managing projects, folders, organizations,
+    and their IAM policies and metadata. Connects over streamable HTTP to Google's fixed endpoint; the OAuth access token
+    (from gcloud Application Default Credentials or a service account) is swapped into the Authorization header at egress
+    by credproxy, so the sandbox only sees a placeholder.
+  version: 1.0.0
+  author: Google
+  source_url: https://docs.cloud.google.com/resource-manager/reference/mcp
+  license: Apache-2.0
+  category: DevOps
+  tags:
+  - google-cloud
+  - gcp
+  - resource-manager
+  - projects
+  - folders
+  - organizations
+  - iam
+  - devops
+  transport: http
+  command: ''
+  args: []
+  url: https://cloudresourcemanager.googleapis.com/mcp
+  headers:
+  - Authorization=Bearer ${GCP_ACCESS_TOKEN}
+  timeout: 300
+  egress_hosts:
+  - cloudresourcemanager.googleapis.com
+  env:
+    required:
+    - GCP_ACCESS_TOKEN
+    optional: []
+  content_hash: 9ecdfe1f7ccc
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: gcp-spanner
+  path: servers/gcp-spanner
+  title: Spanner (Google Cloud)
+  summary: Google Cloud's managed remote MCP server for Cloud Spanner. Tools to explore instances and databases, run SQL/GQL
+    queries, and inspect schema over the streamable-HTTP transport. Rides Robomotion credproxy — the OAuth 2.0 access token
+    is swapped into the Authorization header at egress; the sandbox sees only a placeholder.
+  version: 1.0.0
+  author: Google
+  source_url: https://docs.cloud.google.com/spanner/docs/use-spanner-mcp
+  license: Apache-2.0
+  category: Databases
+  tags:
+  - google-cloud
+  - gcp
+  - spanner
+  - database
+  - sql
+  - gql
+  - remote
+  transport: http
+  command: ''
+  args: []
+  url: https://spanner.googleapis.com/mcp
+  headers:
+  - Authorization=Bearer ${GOOGLE_CLOUD_ACCESS_TOKEN}
+  - x-goog-user-project=${GOOGLE_CLOUD_PROJECT}
+  timeout: 300
+  egress_hosts:
+  - spanner.googleapis.com
+  env:
+    required:
+    - GOOGLE_CLOUD_ACCESS_TOKEN
+    - GOOGLE_CLOUD_PROJECT
+    optional: []
+  content_hash: 29bd47637f55
   files:
   - .robomotion/mcp.yaml
   - MCP.md
@@ -136,15 +1542,627 @@ servers:
   headers:
   - Authorization=Bearer ${GITHUB_PERSONAL_ACCESS_TOKEN}
   timeout: 300
+  egress_hosts:
+  - api.githubcopilot.com
   env:
     required:
     - GITHUB_PERSONAL_ACCESS_TOKEN
     optional: []
-  content_hash: d4a01d9da8d6
+  content_hash: 4c6b7bd03b40
   files:
   - .robomotion/mcp.yaml
   - MCP.md
   - env.required
+- name: github-awesome-copilot
+  path: servers/github-awesome-copilot
+  title: GitHub Awesome-Copilot
+  summary: Microsoft's Awesome Copilot MCP server. Tools to search and load the community customizations published in the
+    github/awesome-copilot repository — agents, prompts, instructions, skills, collections, and chat modes. Runs as a stdio
+    subprocess (Docker container) inside the agent sandbox; no credentials are required, so nothing sensitive enters the sandbox.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://github.com/microsoft/mcp-dotnet-samples/tree/main/awesome-copilot
+  license: MIT
+  category: Developer Tools
+  tags:
+  - github
+  - copilot
+  - prompts
+  - instructions
+  - agents
+  - customizations
+  - stdio
+  transport: stdio
+  command: docker
+  args:
+  - run
+  - -i
+  - --rm
+  - ghcr.io/microsoft/mcp-dotnet-samples/awesome-copilot:latest
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - github.com
+  - raw.githubusercontent.com
+  env:
+    required: []
+    optional: []
+  content_hash: 06586ec3df5c
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+- name: google-analytics
+  path: servers/google-analytics
+  title: Google Analytics
+  summary: Google's official Google Analytics MCP server. Tools to explore your GA4 account and run reports via the Analytics
+    Admin and Data APIs. Runs as a stdio subprocess inside the agent sandbox; the service-account / ADC credentials enter
+    the container only as credproxy placeholders, swapped for the real values at TLS egress, so the sandbox never holds the
+    secret.
+  version: 1.0.0
+  author: Google
+  source_url: https://github.com/googleanalytics/google-analytics-mcp
+  license: Apache-2.0
+  category: Analytics
+  tags:
+  - google-analytics
+  - ga4
+  - analytics
+  - reporting
+  - admin-api
+  - data-api
+  - stdio
+  transport: stdio
+  command: pipx
+  args:
+  - run
+  - analytics-mcp
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - analyticsadmin.googleapis.com
+  - analyticsdata.googleapis.com
+  env:
+    required:
+    - GOOGLE_APPLICATION_CREDENTIALS
+    optional:
+    - GOOGLE_PROJECT_ID
+  content_hash: cbb6810c8132
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.optional
+  - env.required
+- name: google-chrome-devtools
+  path: servers/google-chrome-devtools
+  title: Chrome DevTools MCP
+  summary: Google's Chrome DevTools MCP server. Tools to drive a Chrome browser — navigate pages, inspect the DOM and network,
+    capture performance traces and screenshots, and run JavaScript via the DevTools protocol. Runs as a stdio subprocess inside
+    the agent sandbox; no credential is required, so nothing enters the container and the sandbox never holds a secret.
+  version: 1.0.0
+  author: Google
+  source_url: https://github.com/ChromeDevTools/chrome-devtools-mcp
+  license: Apache-2.0
+  category: Developer Tools
+  tags:
+  - chrome
+  - devtools
+  - browser
+  - automation
+  - performance
+  - debugging
+  - stdio
+  transport: stdio
+  command: npx
+  args:
+  - -y
+  - chrome-devtools-mcp@latest
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - chromeuxreport.googleapis.com
+  env:
+    required: []
+    optional: []
+  content_hash: f8a2d239a71d
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+- name: google-cloud-observability
+  path: servers/google-cloud-observability
+  title: Google Cloud Observability
+  summary: Google Cloud Observability MCP server. Tools to query Cloud Logging, Cloud Monitoring, and related telemetry through
+    natural language. Runs as a stdio subprocess via npx and authenticates with gcloud Application Default Credentials resolved
+    host-side; the agent attaches over the credstdio loopback bridge and the sandbox never holds the credentials.
+  version: 1.0.0
+  author: Google
+  source_url: https://github.com/googleapis/gcloud-mcp/tree/main/packages/observability-mcp
+  license: Apache-2.0
+  category: DevOps
+  tags:
+  - google-cloud
+  - gcp
+  - observability
+  - logging
+  - monitoring
+  - devops
+  - stdio
+  transport: stdio
+  command: npx
+  args:
+  - -y
+  - '@google-cloud/observability-mcp'
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - logging.googleapis.com
+  - monitoring.googleapis.com
+  - oauth2.googleapis.com
+  env:
+    required: []
+    optional: []
+  content_hash: f2f96d458ab2
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+- name: google-cloud-run-deploy
+  path: servers/google-cloud-run-deploy
+  title: Cloud Run (open-source deploy MCP)
+  summary: Google's open-source Cloud Run MCP server. Tools to deploy code, list and inspect Cloud Run services, read service
+    logs, and manage projects on Google Cloud. Runs as a stdio subprocess inside the agent sandbox via npx; the Google Cloud
+    project/region identifiers and Application Default Credentials enter the container only as credproxy placeholders, swapped
+    for the real values at TLS egress, so the sandbox never holds the secret.
+  version: 1.0.0
+  author: Google
+  source_url: https://github.com/GoogleCloudPlatform/cloud-run-mcp
+  license: Apache-2.0
+  category: DevOps
+  tags:
+  - google-cloud
+  - gcp
+  - cloud-run
+  - devops
+  - deploy
+  - serverless
+  - stdio
+  transport: stdio
+  command: npx
+  args:
+  - -y
+  - '@google-cloud/cloud-run-mcp'
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - run.googleapis.com
+  - cloudresourcemanager.googleapis.com
+  - logging.googleapis.com
+  - cloudbuild.googleapis.com
+  - oauth2.googleapis.com
+  env:
+    required:
+    - GOOGLE_CLOUD_PROJECT
+    - GOOGLE_CLOUD_REGION
+    - GOOGLE_APPLICATION_CREDENTIALS
+    optional:
+    - DEFAULT_SERVICE_NAME
+  content_hash: 1ab4ab687a97
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.optional
+  - env.required
+- name: google-cloud-security
+  path: servers/google-cloud-security
+  title: Google Cloud Security
+  summary: Google Security Operations (Chronicle) MCP server from the google/mcp-security suite. Tools for threat detection,
+    UDM search, detection rules, alerts, and case triage across your Chronicle SecOps instance. Runs as a stdio subprocess
+    inside the agent sandbox; the service-account key and Chronicle identifiers enter the container only as credproxy placeholders,
+    swapped for the real values at TLS egress, so the sandbox never holds the secret.
+  version: 1.0.0
+  author: Google
+  source_url: https://github.com/google/mcp-security
+  license: Apache-2.0
+  category: Security
+  tags:
+  - google
+  - security
+  - chronicle
+  - secops
+  - siem
+  - threat-detection
+  - udm
+  - stdio
+  transport: stdio
+  command: uvx
+  args:
+  - --from
+  - google-secops-mcp
+  - secops_mcp
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts: []
+  env:
+    required:
+    - CHRONICLE_PROJECT_ID
+    - CHRONICLE_CUSTOMER_ID
+    - CHRONICLE_REGION
+    optional:
+    - SECOPS_SA_PATH
+  content_hash: 125a4057617b
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.optional
+  - env.required
+- name: google-cloud-storage-mcp
+  path: servers/google-cloud-storage-mcp
+  title: Google Cloud Storage (open-source)
+  summary: Google's open-source Cloud Storage MCP server. Tools for buckets and objects — list, read, upload, manage, and
+    inspect Google Cloud Storage. Runs as a stdio subprocess inside the agent sandbox via npx; authenticates with Application
+    Default Credentials. The service-account key enters the container only as a credproxy placeholder, swapped for the real
+    value at TLS egress, so the sandbox never holds the secret.
+  version: 1.0.0
+  author: Google
+  source_url: https://github.com/googleapis/gcloud-mcp/tree/main/packages/storage-mcp
+  license: Apache-2.0
+  category: Storage
+  tags:
+  - google-cloud
+  - gcs
+  - storage
+  - buckets
+  - objects
+  - gcp
+  - stdio
+  transport: stdio
+  command: npx
+  args:
+  - -y
+  - '@google-cloud/storage-mcp'
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - storage.googleapis.com
+  env:
+    required:
+    - GOOGLE_APPLICATION_CREDENTIALS
+    optional:
+    - GOOGLE_CLOUD_PROJECT
+  content_hash: 17d58cb3abac
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.optional
+  - env.required
+- name: google-dart-mcp
+  path: servers/google-dart-mcp
+  title: Flutter / Dart MCP
+  summary: The official Dart MCP server, shipped with the Dart SDK. Tools to analyze projects, run tests, manage pub dependencies,
+    search pub.dev, and drive the Dart Tooling Daemon for Dart and Flutter apps. Runs as a stdio subprocess inside the agent
+    sandbox via the bundled Dart SDK; no credential is required, so nothing sensitive ever enters the sandbox.
+  version: 1.0.0
+  author: Google
+  source_url: https://github.com/dart-lang/ai/tree/main/pkgs/dart_mcp_server
+  license: BSD-3-Clause
+  category: Developer Tools
+  tags:
+  - dart
+  - flutter
+  - developer-tools
+  - pub
+  - testing
+  - mcp
+  - stdio
+  transport: stdio
+  command: dart
+  args:
+  - mcp-server
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - pub.dev
+  env:
+    required: []
+    optional: []
+  content_hash: 6d36c38ec4a0
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+- name: google-firebase
+  path: servers/google-firebase
+  title: Firebase (Gemini CLI extension)
+  summary: Firebase's official MCP server, bundled with the Firebase CLI. Tools for Firestore, Authentication, Cloud Storage,
+    Realtime Database, Cloud Messaging, App Hosting, and project management. Runs as a stdio subprocess inside the agent sandbox
+    via npx; the service-account credentials enter the container only as credproxy placeholders, swapped for the real values
+    at TLS egress, so the sandbox never holds the secret.
+  version: 1.0.0
+  author: Google
+  source_url: https://github.com/firebase/firebase-tools/tree/master/src/mcp
+  license: Apache-2.0
+  category: DevOps
+  tags:
+  - firebase
+  - google
+  - devops
+  - firestore
+  - auth
+  - storage
+  - messaging
+  - stdio
+  transport: stdio
+  command: npx
+  args:
+  - -y
+  - firebase-tools@latest
+  - mcp
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - firebase.googleapis.com
+  - firestore.googleapis.com
+  - identitytoolkit.googleapis.com
+  - firebasestorage.googleapis.com
+  - firebasedatabase.googleapis.com
+  - fcm.googleapis.com
+  - oauth2.googleapis.com
+  env:
+    required:
+    - GOOGLE_APPLICATION_CREDENTIALS
+    optional:
+    - FIREBASE_PROJECT
+  content_hash: 9fab1b3baff3
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.optional
+  - env.required
+- name: google-gcloud-cli
+  path: servers/google-gcloud-cli
+  title: gcloud CLI MCP
+  summary: Google's gcloud CLI MCP server. Wraps the locally installed gcloud CLI so agents can run Google Cloud commands
+    for compute, storage, IAM, Cloud Run, GKE, and more. Runs through the credstdio bridge, spawned host-side with the host's
+    gcloud Application Default Credentials (or an optional service-account key path injected host-side), so the secret never
+    enters the agent sandbox.
+  version: 1.0.0
+  author: Google
+  source_url: https://github.com/googleapis/gcloud-mcp/tree/main/packages/gcloud-mcp
+  license: Apache-2.0
+  category: DevOps
+  tags:
+  - google-cloud
+  - gcp
+  - gcloud
+  - devops
+  - cloud
+  - cli
+  - stdio
+  transport: stdio
+  command: npx
+  args:
+  - -y
+  - '@google-cloud/gcloud-mcp'
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - googleapis.com
+  - oauth2.googleapis.com
+  - accounts.google.com
+  env:
+    required: []
+    optional:
+    - GOOGLE_APPLICATION_CREDENTIALS
+  content_hash: e50377576efd
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.optional
+- name: google-genai-toolbox
+  path: servers/google-genai-toolbox
+  title: MCP Toolbox for Databases
+  summary: Google's open-source MCP Toolbox for Databases. Prebuilt generic tools (list_tables, execute_sql, and more) for
+    PostgreSQL and many other engines via the --prebuilt flag. Runs as a stdio subprocess inside the agent sandbox; the database
+    host, name, and credentials enter the container only as credproxy placeholders, swapped for the real values at TLS egress,
+    so the sandbox never holds the secret.
+  version: 1.0.0
+  author: Google
+  source_url: https://github.com/googleapis/genai-toolbox
+  license: Apache-2.0
+  category: Databases
+  tags:
+  - database
+  - postgres
+  - sql
+  - bigquery
+  - cloud-sql
+  - alloydb
+  - data
+  - stdio
+  transport: stdio
+  command: npx
+  args:
+  - -y
+  - '@toolbox-sdk/server'
+  - --prebuilt=postgres
+  - --stdio
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts: []
+  env:
+    required:
+    - POSTGRES_HOST
+    - POSTGRES_DATABASE
+    - POSTGRES_USER
+    - POSTGRES_PASSWORD
+    optional:
+    - POSTGRES_PORT
+  content_hash: 6c0042bccf9d
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.optional
+  - env.required
+- name: google-genmedia
+  path: servers/google-genmedia
+  title: Genmedia (Imagen / Veo)
+  summary: Google Cloud Vertex AI generative-media MCP servers. Tools for image generation and editing with Imagen and video
+    creation with Veo (sibling binaries also cover Gemini image, Chirp 3 TTS, and Lyria music). Runs as a stdio subprocess
+    inside the agent sandbox using the bundled Go binary; the Google Cloud project and service-account credentials enter the
+    container only as credstdio-injected values, so the sandbox never holds the secret.
+  version: 1.0.0
+  author: Google
+  source_url: https://github.com/GoogleCloudPlatform/vertex-ai-creative-studio/tree/main/experiments/mcp-genmedia
+  license: Apache-2.0
+  category: AI / ML
+  tags:
+  - google
+  - vertex-ai
+  - imagen
+  - veo
+  - image-generation
+  - video-generation
+  - gcp
+  - stdio
+  transport: stdio
+  command: mcp-imagen-go
+  args: []
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - aiplatform.googleapis.com
+  - us-central1-aiplatform.googleapis.com
+  - storage.googleapis.com
+  env:
+    required:
+    - GOOGLE_CLOUD_PROJECT
+    - GOOGLE_APPLICATION_CREDENTIALS
+    optional:
+    - GOOGLE_CLOUD_LOCATION
+    - GENMEDIA_BUCKET
+  content_hash: 1ebb25e0bc1a
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.optional
+  - env.required
+- name: google-gke-mcp
+  path: servers/google-gke-mcp
+  title: GKE (open-source MCP)
+  summary: Google's open-source GKE MCP server. Tools for Google Kubernetes Engine clusters, node pools, Kubernetes manifests,
+    Cloud Logging queries, and GKE release notes. Runs as a stdio subprocess inside the agent sandbox via the bundled gke-mcp
+    binary; it authenticates with Google Cloud Application Default Credentials supplied host-side by the credstdio bridge,
+    so the sandbox never holds the secret.
+  version: 1.0.0
+  author: Google
+  source_url: https://github.com/GoogleCloudPlatform/gke-mcp
+  license: Apache-2.0
+  category: DevOps
+  tags:
+  - google
+  - gke
+  - kubernetes
+  - gcp
+  - devops
+  - clusters
+  - k8s
+  - stdio
+  transport: stdio
+  command: gke-mcp
+  args: []
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - container.googleapis.com
+  - logging.googleapis.com
+  - cloudresourcemanager.googleapis.com
+  env:
+    required: []
+    optional: []
+  content_hash: e6a85872e837
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+- name: google-go-gopls
+  path: servers/google-go-gopls
+  title: Go (gopls MCP)
+  summary: The Go language server (gopls) running in detached MCP mode. Tools for navigating, analyzing, and editing Go code
+    — symbol search, references, diagnostics, and workspace context. Runs as a stdio subprocess inside the agent sandbox via
+    the bundled Go toolchain; it operates purely on local source and requires no credentials, so no secret enters the sandbox.
+  version: 1.0.0
+  author: Google
+  source_url: https://go.dev/gopls/features/mcp
+  license: BSD-3-Clause
+  category: Developer Tools
+  tags:
+  - go
+  - golang
+  - gopls
+  - language-server
+  - developer-tools
+  - code-analysis
+  - stdio
+  transport: stdio
+  command: gopls
+  args:
+  - mcp
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts: []
+  env:
+    required: []
+    optional: []
+  content_hash: 6340e546dc3c
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+- name: google-maps-code-assist
+  path: servers/google-maps-code-assist
+  title: Google Maps Platform Code Assist
+  summary: Google's official Maps Platform Code Assist toolkit. Grounds your AI coding assistant in the latest Maps Platform
+    documentation, official code samples, and expert-authored best practices so generated Maps code is accurate and current.
+    Runs as a stdio subprocess inside the agent sandbox via npx; the documentation-retrieval tools need no API key, so no
+    credentials enter the container.
+  version: 1.0.0
+  author: Google
+  source_url: https://github.com/googlemaps/platform-ai/tree/main/packages/code-assist
+  license: ISC
+  category: Developer Tools
+  tags:
+  - google-maps
+  - maps-platform
+  - code-assist
+  - documentation
+  - developer-tools
+  - stdio
+  transport: stdio
+  command: npx
+  args:
+  - -y
+  - '@googlemaps/code-assist-mcp@latest'
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - mapscodeassist.googleapis.com
+  env:
+    required: []
+    optional: []
+  content_hash: 63117c9abc7f
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
 - name: google-workspace
   path: servers/google-workspace
   title: Google Workspace (Remote)
@@ -171,21 +2189,878 @@ servers:
   headers:
   - Authorization=Bearer ${GOOGLE_WORKSPACE_MCP_TOKEN}
   timeout: 300
+  egress_hosts: []
   env:
     required: []
     optional:
     - GOOGLE_WORKSPACE_MCP_TOKEN
-  content_hash: c8133c8a3666
+  content_hash: b738c0d2415e
   files:
   - .robomotion/mcp.yaml
   - MCP.md
   - env.optional
+- name: m365-agents-toolkit
+  path: servers/m365-agents-toolkit
+  title: Microsoft 365 Agents Toolkit
+  summary: The Microsoft 365 Agents Toolkit MCP server. Bridges AI coding agents and the toolkit to scaffold, build, test,
+    and deploy apps and agents for Microsoft 365 and Microsoft 365 Copilot — custom engine agents, declarative agents, Teams
+    apps, and Adaptive Cards. Runs as a stdio subprocess inside the agent sandbox via npx; no static credential is bound (Microsoft
+    365 sign-in is interactive), so no credproxy placeholder ships and the sandbox never holds a secret.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://github.com/OfficeDev/microsoft-365-agents-toolkit
+  license: MIT
+  category: Productivity
+  tags:
+  - microsoft
+  - m365
+  - teams
+  - copilot
+  - agents
+  - declarative-agents
+  - scaffold
+  - stdio
+  transport: stdio
+  command: npx
+  args:
+  - -y
+  - '@microsoft/m365agentstoolkit-mcp@latest'
+  - server
+  - start
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts: []
+  env:
+    required: []
+    optional: []
+  content_hash: e734065b1a8a
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+- name: m365-calendar
+  path: servers/m365-calendar
+  title: Microsoft 365 Calendar
+  summary: Microsoft 365 Calendar MCP server (Agent365). Tools for creating, updating, and deleting events, managing invites,
+    and checking availability via the Microsoft Graph Calendar APIs. The endpoint host is fixed but your Microsoft Entra tenant
+    ID is bound into the request path at hire time. Rides Robomotion credproxy — the sandbox sees only a placeholder for the
+    tenant identifier, never a real secret.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://github.com/microsoft/mcp
+  license: MIT
+  category: Productivity
+  tags:
+  - microsoft-365
+  - calendar
+  - outlook
+  - microsoft-graph
+  - agent365
+  - events
+  - scheduling
+  transport: http
+  command: ''
+  args: []
+  url: https://agent365.svc.cloud.microsoft/agents/tenants/${MICROSOFT_TENANT_ID}/servers/mcp_CalendarTools
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - agent365.svc.cloud.microsoft
+  env:
+    required:
+    - MICROSOFT_TENANT_ID
+    optional: []
+  content_hash: 8ef444c871f6
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: m365-copilot-chat
+  path: servers/m365-copilot-chat
+  title: Microsoft 365 Copilot Chat
+  summary: Microsoft 365 Copilot Chat MCP server (Agent365). Tools to search and retrieve across M365 content — documents,
+    emails, sites, files, and chats — grounded in your tenant via the Microsoft 365 Copilot APIs. The endpoint host is fixed
+    but your Microsoft Entra tenant ID is bound into the request path at hire time. Rides Robomotion credproxy — the sandbox
+    sees only a placeholder for the tenant identifier, never a real secret.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://github.com/microsoft/mcp
+  license: MIT
+  category: Productivity
+  tags:
+  - microsoft-365
+  - copilot
+  - chat
+  - search
+  - microsoft-graph
+  - agent365
+  - productivity
+  transport: http
+  command: ''
+  args: []
+  url: https://agent365.svc.cloud.microsoft/agents/tenants/${MICROSOFT_TENANT_ID}/servers/mcp_M365Copilot
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - agent365.svc.cloud.microsoft
+  env:
+    required:
+    - MICROSOFT_TENANT_ID
+    optional: []
+  content_hash: 375bda136a5c
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: m365-mail
+  path: servers/m365-mail
+  title: Microsoft 365 Mail
+  summary: Microsoft 365 Mail MCP server (Agent365). Tools for creating, sending, replying to, updating, deleting, and searching
+    messages via the Microsoft Graph Mail APIs. The endpoint host is fixed but your Microsoft Entra tenant ID is bound into
+    the request path at hire time. Rides Robomotion credproxy — the sandbox sees only a placeholder for the tenant identifier,
+    never a real secret.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://github.com/microsoft/mcp
+  license: MIT
+  category: Productivity
+  tags:
+  - microsoft-365
+  - mail
+  - outlook
+  - email
+  - microsoft-graph
+  - agent365
+  - messages
+  transport: http
+  command: ''
+  args: []
+  url: https://agent365.svc.cloud.microsoft/agents/tenants/${MICROSOFT_TENANT_ID}/servers/mcp_MailTools
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - agent365.svc.cloud.microsoft
+  env:
+    required:
+    - MICROSOFT_TENANT_ID
+    optional: []
+  content_hash: 24cec1773c1b
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: m365-teams
+  path: servers/m365-teams
+  title: Microsoft Teams
+  summary: Microsoft Teams MCP server (Agent365). Tools for working with Teams chats, channels, and messages via the Microsoft
+    Graph APIs. The endpoint host is fixed but your Microsoft Entra tenant ID is bound into the request path at hire time.
+    Rides Robomotion credproxy — the sandbox sees only a placeholder for the tenant identifier, never a real secret.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://github.com/microsoft/mcp
+  license: MIT
+  category: Productivity
+  tags:
+  - microsoft-365
+  - teams
+  - chat
+  - channels
+  - messages
+  - microsoft-graph
+  - agent365
+  transport: http
+  command: ''
+  args: []
+  url: https://agent365.svc.cloud.microsoft/agents/tenants/${MICROSOFT_TENANT_ID}/servers/mcp_TeamsServer
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - agent365.svc.cloud.microsoft
+  env:
+    required:
+    - MICROSOFT_TENANT_ID
+    optional: []
+  content_hash: 77444cff38ba
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: m365-user
+  path: servers/m365-user
+  title: Microsoft 365 User
+  summary: Microsoft 365 User MCP server (Agent365). Tools for retrieving the signed-in user's profile, manager, team, and
+    direct reports via the Microsoft Graph APIs. The endpoint host is fixed but your Microsoft Entra tenant ID is bound into
+    the request path at hire time. Rides Robomotion credproxy — the sandbox sees only a placeholder for the tenant identifier,
+    never a real secret.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://github.com/microsoft/mcp
+  license: MIT
+  category: Productivity
+  tags:
+  - microsoft-365
+  - user
+  - profile
+  - directory
+  - microsoft-graph
+  - agent365
+  - identity
+  transport: http
+  command: ''
+  args: []
+  url: https://agent365.svc.cloud.microsoft/agents/tenants/${MICROSOFT_TENANT_ID}/servers/mcp_MeServer
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - agent365.svc.cloud.microsoft
+  env:
+    required:
+    - MICROSOFT_TENANT_ID
+    optional: []
+  content_hash: 4c318dc5201a
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: m365-word
+  path: servers/m365-word
+  title: Microsoft Word
+  summary: Microsoft Word MCP server (Agent365). Tools for reading and understanding documents, creating new ones, and collaborating
+    through comments via the Microsoft Graph APIs. The endpoint host is fixed but your Microsoft Entra tenant ID is bound
+    into the request path at hire time. Rides Robomotion credproxy — the sandbox sees only a placeholder for the tenant identifier,
+    never a real secret.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://github.com/microsoft/mcp
+  license: MIT
+  category: Productivity
+  tags:
+  - microsoft-365
+  - word
+  - documents
+  - docx
+  - microsoft-graph
+  - agent365
+  - office
+  transport: http
+  command: ''
+  args: []
+  url: https://agent365.svc.cloud.microsoft/agents/tenants/${MICROSOFT_TENANT_ID}/servers/mcp_WordServer
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - agent365.svc.cloud.microsoft
+  env:
+    required:
+    - MICROSOFT_TENANT_ID
+    optional: []
+  content_hash: c04fce2c2218
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: markitdown
+  path: servers/markitdown
+  title: Markitdown
+  summary: Microsoft's MarkItDown MCP server. A tool that converts files and URIs (PDF, Office documents, images, audio, HTML,
+    and more) into clean Markdown for LLM consumption. Runs as a stdio subprocess inside the agent sandbox; no external credential
+    is required, so nothing is bound and the sandbox never holds a secret.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://github.com/microsoft/markitdown
+  license: MIT
+  category: Developer Tools
+  tags:
+  - markdown
+  - conversion
+  - documents
+  - pdf
+  - office
+  - ocr
+  - developer-tools
+  - stdio
+  transport: stdio
+  command: uvx
+  args:
+  - markitdown-mcp
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts: []
+  env:
+    required: []
+    optional: []
+  content_hash: b7e6a67bc980
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+- name: microsoft-admin-center
+  path: servers/microsoft-admin-center
+  title: Microsoft Admin Center
+  summary: Microsoft Admin Center MCP server (Agent365). Tools for tenant administration actions backed by the Microsoft Admin
+    Center APIs. The endpoint host is fixed but your Microsoft Entra tenant ID is bound into the request path at hire time.
+    Rides Robomotion credproxy — the sandbox sees only a placeholder for the tenant identifier, never a real secret.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://github.com/microsoft/mcp
+  license: MIT
+  category: Productivity
+  tags:
+  - microsoft-365
+  - admin
+  - admin-center
+  - microsoft-graph
+  - agent365
+  - administration
+  - tenant
+  transport: http
+  command: ''
+  args: []
+  url: https://agent365.svc.cloud.microsoft/agents/tenants/${MICROSOFT_TENANT_ID}/servers/mcp_AdminTools
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - agent365.svc.cloud.microsoft
+  env:
+    required:
+    - MICROSOFT_TENANT_ID
+    optional: []
+  content_hash: f518be486095
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: microsoft-clarity
+  path: servers/microsoft-clarity
+  title: Microsoft Clarity
+  summary: Microsoft Clarity MCP server. Tools to query your Clarity project's live insights via the Clarity Data Export API
+    — traffic, engagement, scroll depth, and behavior metrics broken down by dimensions like browser, device, OS, and country.
+    Runs as a stdio subprocess inside the agent sandbox; the Clarity API token enters the container only as a credproxy placeholder,
+    swapped for the real value at TLS egress, so the sandbox never holds the secret.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://github.com/microsoft/clarity-mcp-server
+  license: MIT
+  category: Analytics
+  tags:
+  - microsoft
+  - clarity
+  - analytics
+  - web-analytics
+  - insights
+  - data-export
+  - stdio
+  transport: stdio
+  command: npx
+  args:
+  - '@microsoft/clarity-mcp-server'
+  - --clarity_api_token=${CLARITY_API_TOKEN}
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - www.clarity.ms
+  env:
+    required:
+    - CLARITY_API_TOKEN
+    optional: []
+  content_hash: 1c1c4c62c938
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: microsoft-dataverse
+  path: servers/microsoft-dataverse
+  title: Microsoft Dataverse
+  summary: Microsoft Dataverse MCP server. Tools to list and describe tables, query and manage records, and work with schema
+    (tables, columns, relationships, option sets) over the Dataverse Web API. Runs as a stdio local-proxy subprocess (the
+    @microsoft/dataverse npm package) inside the agent sandbox; the Dataverse environment URL enters the container only as
+    a credproxy placeholder, swapped for the real value at TLS egress, so the sandbox never holds the secret.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://learn.microsoft.com/power-apps/maker/data-platform/data-platform-mcp
+  license: MIT
+  category: Productivity
+  tags:
+  - microsoft
+  - dataverse
+  - power-platform
+  - dynamics
+  - crm
+  - tables
+  - records
+  - stdio
+  transport: stdio
+  command: npx
+  args:
+  - -y
+  - '@microsoft/dataverse'
+  - mcp
+  - ${DATAVERSE_ENVIRONMENT_URL}
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts: []
+  env:
+    required:
+    - DATAVERSE_ENVIRONMENT_URL
+    optional: []
+  content_hash: fd225ed1fa62
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: microsoft-devbox
+  path: servers/microsoft-devbox
+  title: Microsoft Dev Box
+  summary: Microsoft Dev Box MCP server. Tools to list projects and pools, create, start, stop, and delete dev boxes, and
+    manage shutdown schedules and customizations through the Dev Box control plane. Runs as a stdio subprocess inside the
+    agent sandbox; it authenticates via DefaultAzureCredential (Azure CLI / Windows SSO / managed identity), so no static
+    token credential is injected and the sandbox never holds a long-lived secret.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://github.com/microsoft/devbox-mcp-server
+  license: MIT
+  category: DevOps
+  tags:
+  - microsoft
+  - azure
+  - dev-box
+  - devops
+  - cloud
+  - dev-environments
+  - stdio
+  transport: stdio
+  command: npx
+  args:
+  - -y
+  - '@microsoft/devbox-mcp@latest'
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - management.azure.com
+  - devcenter.azure.com
+  - login.microsoftonline.com
+  env:
+    required: []
+    optional: []
+  content_hash: f660dffab661
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+- name: microsoft-fabric
+  path: servers/microsoft-fabric
+  title: Microsoft Fabric
+  summary: Microsoft's local-first Fabric MCP server. Tools for exploring Fabric REST API specifications, item definitions,
+    and development best practices to build and operate Fabric workloads. Runs as a stdio subprocess inside the agent sandbox
+    via the bundled runtimes; it is local-first and requires no credentials, so no secret enters the sandbox.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://github.com/microsoft/mcp/tree/main/servers/Fabric.Mcp.Server
+  license: MIT
+  category: Analytics
+  tags:
+  - microsoft
+  - fabric
+  - analytics
+  - data
+  - onelake
+  - rest-api
+  - stdio
+  transport: stdio
+  command: npx
+  args:
+  - -y
+  - '@microsoft/fabric-mcp@latest'
+  - server
+  - start
+  - --mode
+  - all
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts: []
+  env:
+    required: []
+    optional: []
+  content_hash: c98803cb7615
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+- name: microsoft-fabric-rti
+  path: servers/microsoft-fabric-rti
+  title: Microsoft Fabric Real-Time Intelligence
+  summary: Microsoft Fabric Real-Time Intelligence MCP server. Tools for querying and managing Kusto / Eventhouse (KQL) databases
+    and Fabric RTI workloads. Runs as a stdio subprocess inside the agent sandbox via uvx; authentication uses the Azure Identity
+    DefaultAzureCredential chain and any cluster identifiers enter the container only as credproxy placeholders, swapped for
+    the real values at TLS egress, so the sandbox never holds the secret.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://github.com/microsoft/fabric-rti-mcp
+  license: MIT
+  category: Analytics
+  tags:
+  - microsoft
+  - fabric
+  - real-time-intelligence
+  - kusto
+  - kql
+  - eventhouse
+  - analytics
+  - stdio
+  transport: stdio
+  command: uvx
+  args:
+  - microsoft-fabric-rti-mcp
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts: []
+  env:
+    required: []
+    optional:
+    - KUSTO_SERVICE_URI
+    - KUSTO_SERVICE_DEFAULT_DB
+    - FABRIC_API_BASE
+  content_hash: 9243d96ff6e3
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.optional
+- name: microsoft-foundry
+  path: servers/microsoft-foundry
+  title: Microsoft Foundry
+  summary: Foundry MCP Server (preview), Microsoft's cloud-hosted MCP endpoint for Azure AI Foundry. Exposes curated tools
+    to read and write against Foundry services — models, projects, and resources — without calling backend APIs directly.
+    Authentication is interactive Microsoft Entra ID OAuth performed by the MCP client (no static token is bound), so no credproxy
+    header placeholder ships; the agent never holds a long-lived secret.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://learn.microsoft.com/azure/ai-foundry/mcp/get-started
+  license: MIT
+  category: AI / ML
+  tags:
+  - microsoft
+  - azure
+  - ai-foundry
+  - foundry
+  - ai
+  - ml
+  - models
+  - entra
+  - oauth
+  transport: http
+  command: ''
+  args: []
+  url: https://mcp.ai.azure.com
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - mcp.ai.azure.com
+  env:
+    required: []
+    optional: []
+  content_hash: 5076ec7a4a8e
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+- name: microsoft-learn
+  path: servers/microsoft-learn
+  title: Microsoft Learn
+  summary: Microsoft's official remote MCP server for Microsoft Learn. Tools to search the official documentation, fetch complete
+    articles, and search code samples from the Learn knowledge service. The public docs endpoint requires no credential; the
+    agent connects over streamable HTTP and no token enters the sandbox.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://learn.microsoft.com/training/support/mcp
+  license: MIT
+  category: Developer Tools
+  tags:
+  - microsoft
+  - microsoft-learn
+  - docs
+  - documentation
+  - search
+  - code-samples
+  transport: http
+  command: ''
+  args: []
+  url: https://learn.microsoft.com/api/mcp
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - learn.microsoft.com
+  env:
+    required: []
+    optional: []
+  content_hash: 420f46339020
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+- name: microsoft-sentinel-data-exploration
+  path: servers/microsoft-sentinel-data-exploration
+  title: Microsoft Sentinel Data Exploration
+  summary: Microsoft Sentinel Data Exploration MCP server. Tools to search the data lake table catalog, run KQL queries, list
+    workspaces, and run AI entity analysis over URL, domain, and user entities. Authenticates with an interactive Microsoft
+    Entra sign-in (Security Reader/Operator/Administrator role), so no static token is configured here; the sandbox never
+    holds a long-lived secret.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://learn.microsoft.com/en-us/azure/sentinel/datalake/sentinel-mcp-data-exploration-tool
+  license: MIT
+  category: Security
+  tags:
+  - microsoft-sentinel
+  - security
+  - siem
+  - data-lake
+  - kql
+  - threat-hunting
+  - entra
+  transport: http
+  command: ''
+  args: []
+  url: https://sentinel.microsoft.com/mcp/data-exploration
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - sentinel.microsoft.com
+  env:
+    required: []
+    optional: []
+  content_hash: 76dd951ec563
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+- name: microsoft-sql
+  path: servers/microsoft-sql
+  title: Microsoft SQL
+  summary: Microsoft's MSSQL MCP server. Tools to list tables, read schemas, run queries, and modify data on SQL Server, Azure
+    SQL, and Microsoft Fabric via a connection. Runs as a stdio subprocess inside the agent sandbox; the database connection
+    details enter the container only as credproxy placeholders, swapped for the real values host-side, so the sandbox never
+    holds the secret.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://github.com/Azure-Samples/SQL-AI-samples/tree/main/MssqlMcp/Node
+  license: MIT
+  category: Databases
+  tags:
+  - microsoft
+  - mssql
+  - sql-server
+  - azure-sql
+  - fabric
+  - database
+  - sql
+  - stdio
+  transport: stdio
+  command: node
+  args:
+  - /opt/mssql-mcp/dist/index.js
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts: []
+  env:
+    required:
+    - SERVER_NAME
+    - DATABASE_NAME
+    optional:
+    - READONLY
+    - TRUST_SERVER_CERTIFICATE
+  content_hash: f290f9c191e3
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.optional
+  - env.required
+- name: nuget
+  path: servers/nuget
+  title: NuGet MCP Server
+  summary: NuGet's official MCP server. Tools for searching the nuget.org gallery, inspecting package metadata and versions,
+    and managing package dependencies. Runs as a stdio subprocess inside the agent sandbox via the bundled dnx runtime. No
+    credential is required — it talks only to the public nuget.org feed, so nothing sensitive enters the sandbox.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://www.nuget.org/packages/NuGet.Mcp.Server
+  license: MIT
+  category: Developer Tools
+  tags:
+  - nuget
+  - dotnet
+  - packages
+  - dependencies
+  - developer-tools
+  - stdio
+  transport: stdio
+  command: dnx
+  args:
+  - NuGet.Mcp.Server
+  - --source
+  - https://api.nuget.org/v3/index.json
+  - --yes
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - api.nuget.org
+  env:
+    required: []
+    optional: []
+  content_hash: dffaf29e7d5f
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+- name: onedrive-sharepoint
+  path: servers/onedrive-sharepoint
+  title: OneDrive and SharePoint
+  summary: OneDrive and SharePoint MCP server (Agent365). Tools to browse, search, read, and manage files and document libraries
+    across OneDrive and SharePoint, grounded in your tenant via the Microsoft Graph ODSP APIs. The endpoint host is fixed
+    but your Microsoft Entra tenant ID is bound into the request path at hire time. Rides Robomotion credproxy — the sandbox
+    sees only a placeholder for the tenant identifier, never a real secret.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://github.com/microsoft/mcp
+  license: MIT
+  category: Productivity
+  tags:
+  - onedrive
+  - sharepoint
+  - files
+  - documents
+  - microsoft-graph
+  - agent365
+  - productivity
+  transport: http
+  command: ''
+  args: []
+  url: https://agent365.svc.cloud.microsoft/agents/tenants/${MICROSOFT_TENANT_ID}/servers/mcp_ODSPRemoteServer
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - agent365.svc.cloud.microsoft
+  env:
+    required:
+    - MICROSOFT_TENANT_ID
+    optional: []
+  content_hash: 6fa3feba6634
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: playwright
+  path: servers/playwright
+  title: Playwright
+  summary: Microsoft's Playwright MCP server. Tools to drive a real browser — navigate, click, type, fill forms, take snapshots
+    and screenshots, and run end-to-end web automation using Playwright's accessibility tree. Runs as a stdio subprocess inside
+    the agent sandbox via the credstdio bridge. No external credential is required, so nothing is bound at hire time.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://github.com/microsoft/playwright-mcp
+  license: Apache-2.0
+  category: Developer Tools
+  tags:
+  - playwright
+  - browser
+  - automation
+  - e2e
+  - testing
+  - web
+  - scraping
+  - stdio
+  transport: stdio
+  command: npx
+  args:
+  - '@playwright/mcp@latest'
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts: []
+  env:
+    required: []
+    optional: []
+  content_hash: 6ad9b086b84e
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+- name: sharepoint-lists
+  path: servers/sharepoint-lists
+  title: SharePoint Lists
+  summary: SharePoint Lists MCP server (Agent365). Tools for creating, reading, updating, and querying SharePoint list items
+    and columns via the Microsoft Graph APIs. The endpoint host is fixed but your Microsoft Entra tenant ID is bound into
+    the request path at hire time. Rides Robomotion credproxy — the sandbox sees only a placeholder for the tenant identifier,
+    never a real secret.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://github.com/microsoft/mcp
+  license: MIT
+  category: Productivity
+  tags:
+  - microsoft-365
+  - sharepoint
+  - lists
+  - list-items
+  - microsoft-graph
+  - agent365
+  - productivity
+  transport: http
+  command: ''
+  args: []
+  url: https://agent365.svc.cloud.microsoft/agents/tenants/${MICROSOFT_TENANT_ID}/servers/mcp_SharePointListsTools
+  headers: []
+  timeout: 300
+  egress_hosts:
+  - agent365.svc.cloud.microsoft
+  env:
+    required:
+    - MICROSOFT_TENANT_ID
+    optional: []
+  content_hash: 76999e1c3d03
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: wassette
+  path: servers/wassette
+  title: Wassette
+  summary: Microsoft's security-oriented runtime that loads and runs WebAssembly Components as MCP tools, sandboxed by the
+    Wasmtime engine. Runs as a stdio subprocess inside the agent sandbox via the credstdio bridge. No credentials are required;
+    the secret-isolation guarantees still hold because nothing sensitive ever enters the container.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://github.com/microsoft/wassette
+  license: MIT
+  category: Developer Tools
+  tags:
+  - wasm
+  - webassembly
+  - wasmtime
+  - components
+  - sandbox
+  - developer-tools
+  - stdio
+  transport: stdio
+  command: wassette
+  args:
+  - run
+  url: ''
+  headers: []
+  timeout: 300
+  egress_hosts: []
+  env:
+    required: []
+    optional: []
+  content_hash: 5b4442773972
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
 - name: wordpress
   path: servers/wordpress
   title: WordPress
   summary: WordPress MCP server. Tools for posts, pages, media, users, comments, and site settings via the WordPress REST
-    API. Runs as a local stdio subprocess; the application-password credentials are held host-side by the credstdio bridge
-    and never enter the agent sandbox.
+    API. Runs as a stdio subprocess inside the agent sandbox; the application-password credentials enter the container only
+    as credproxy placeholders, swapped for the real values at TLS egress, so the sandbox never holds the secret.
   version: 1.0.0
   author: Automattic
   source_url: https://github.com/Automattic/wordpress-mcp
@@ -207,13 +3082,14 @@ servers:
   url: ''
   headers: []
   timeout: 300
+  egress_hosts: []
   env:
     required:
     - WORDPRESS_API_URL
     - WORDPRESS_USERNAME
     - WORDPRESS_PASSWORD
     optional: []
-  content_hash: 41f79030274c
+  content_hash: 92ec9a6a0b5e
   files:
   - .robomotion/mcp.yaml
   - MCP.md

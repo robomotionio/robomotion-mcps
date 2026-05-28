@@ -1,0 +1,24 @@
+type: mcp
+name: gcp-resource-manager
+title: Cloud Resource Manager (Google Cloud)
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: DevOps
+summary: Google Cloud's managed Cloud Resource Manager remote MCP server. Tools
+  for managing projects, folders, organizations, and their IAM policies and
+  metadata. Connects over streamable HTTP to Google's fixed endpoint; the OAuth
+  access token (from gcloud Application Default Credentials or a service account)
+  is swapped into the Authorization header at egress by credproxy, so the sandbox
+  only sees a placeholder.
+source_url: https://docs.cloud.google.com/resource-manager/reference/mcp
+tags: [google-cloud, gcp, resource-manager, projects, folders, organizations, iam, devops]
+transport: http
+url: https://cloudresourcemanager.googleapis.com/mcp
+headers:
+  - "Authorization=Bearer ${GCP_ACCESS_TOKEN}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - cloudresourcemanager.googleapis.com

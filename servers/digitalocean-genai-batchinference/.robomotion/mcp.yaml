@@ -1,0 +1,22 @@
+type: mcp
+name: digitalocean-genai-batchinference
+title: DigitalOcean GenAI Batch Inference
+author: DigitalOcean
+version: 1.0.0
+license: MIT
+category: AI / ML
+summary: DigitalOcean's hosted GenAI Batch Inference MCP server. Tools to create,
+  manage, and monitor batch inference jobs for asynchronous bulk AI processing.
+  Rides Robomotion credproxy — the DigitalOcean personal access token is swapped
+  into the Authorization header at egress; the sandbox sees only a placeholder.
+source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+tags: [digitalocean, genai, ai, ml, batch-inference, async, jobs]
+transport: http
+url: https://genai-batchinference.mcp.digitalocean.com/mcp
+headers:
+  - "Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - genai-batchinference.mcp.digitalocean.com

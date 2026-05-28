@@ -1,0 +1,24 @@
+type: mcp
+name: m365-agents-toolkit
+title: Microsoft 365 Agents Toolkit
+author: Microsoft
+version: 1.0.0
+license: MIT
+category: Productivity
+summary: The Microsoft 365 Agents Toolkit MCP server. Bridges AI coding agents
+  and the toolkit to scaffold, build, test, and deploy apps and agents for
+  Microsoft 365 and Microsoft 365 Copilot — custom engine agents, declarative
+  agents, Teams apps, and Adaptive Cards. Runs as a stdio subprocess inside the
+  agent sandbox via npx; no static credential is bound (Microsoft 365 sign-in is
+  interactive), so no credproxy placeholder ships and the sandbox never holds a
+  secret.
+source_url: https://github.com/OfficeDev/microsoft-365-agents-toolkit
+tags: [microsoft, m365, teams, copilot, agents, declarative-agents, scaffold, stdio]
+transport: stdio
+command: npx
+args: ["-y", "@microsoft/m365agentstoolkit-mcp@latest", "server", "start"]
+timeout: 300
+# Local developer-tooling server that drives the toolkit and scaffolds projects
+# on the host. It performs no fixed-host API egress under a bound credential
+# (Microsoft 365 authentication is interactive), so no egress allowlist ships.
+egress_hosts: []

@@ -1,0 +1,22 @@
+type: mcp
+name: digitalocean-databases
+title: DigitalOcean Databases
+author: DigitalOcean
+version: 1.0.0
+license: MIT
+category: DevOps
+summary: DigitalOcean's hosted "databases" MCP server. Tools to provision,
+  manage, and monitor managed database clusters (PostgreSQL, MySQL, Redis, and
+  more). Rides Robomotion credproxy — the personal access token is swapped into
+  the Authorization header at egress; the sandbox sees only a placeholder.
+source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+tags: [digitalocean, devops, cloud, databases, postgres, mysql, redis]
+transport: http
+url: https://databases.mcp.digitalocean.com/mcp
+headers:
+  - "Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - databases.mcp.digitalocean.com

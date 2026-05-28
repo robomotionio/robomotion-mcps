@@ -1,0 +1,22 @@
+type: mcp
+name: digitalocean-droplets
+title: DigitalOcean Droplets
+author: DigitalOcean
+version: 1.0.0
+license: MIT
+category: DevOps
+summary: DigitalOcean's hosted "droplets" MCP server. Tools to create, manage,
+  resize, snapshot, and monitor droplets (virtual machines) on DigitalOcean.
+  Rides Robomotion credproxy — the personal access token is swapped into the
+  Authorization header at egress; the sandbox sees only a placeholder.
+source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+tags: [digitalocean, devops, cloud, droplets, vm, compute, snapshots]
+transport: http
+url: https://droplets.mcp.digitalocean.com/mcp
+headers:
+  - "Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - droplets.mcp.digitalocean.com

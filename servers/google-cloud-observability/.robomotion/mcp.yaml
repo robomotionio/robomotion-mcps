@@ -1,0 +1,25 @@
+type: mcp
+name: google-cloud-observability
+title: Google Cloud Observability
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: DevOps
+summary: Google Cloud Observability MCP server. Tools to query Cloud Logging,
+  Cloud Monitoring, and related telemetry through natural language. Runs as a
+  stdio subprocess via npx and authenticates with gcloud Application Default
+  Credentials resolved host-side; the agent attaches over the credstdio loopback
+  bridge and the sandbox never holds the credentials.
+source_url: https://github.com/googleapis/gcloud-mcp/tree/main/packages/observability-mcp
+tags: [google-cloud, gcp, observability, logging, monitoring, devops, stdio]
+transport: stdio
+command: npx
+args: ["-y", "@google-cloud/observability-mcp"]
+timeout: 300
+# Hosts the credentials may egress to. credstdio spawns the server host-side
+# with the real gcloud Application Default Credentials and exposes a loopback
+# socket; the upstream Cloud Observability APIs are reached over these hosts.
+egress_hosts:
+  - logging.googleapis.com
+  - monitoring.googleapis.com
+  - oauth2.googleapis.com

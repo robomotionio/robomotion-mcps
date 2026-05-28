@@ -1,0 +1,22 @@
+type: mcp
+name: digitalocean-spaces
+title: DigitalOcean Spaces
+author: DigitalOcean
+version: 1.0.0
+license: MIT
+category: Storage
+summary: DigitalOcean's hosted Spaces MCP server. Tools for Spaces object
+  storage buckets and Spaces access keys for S3-compatible storage. Rides
+  Robomotion credproxy — the DigitalOcean personal access token is swapped
+  into the Authorization header at egress; the sandbox sees only a placeholder.
+source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+tags: [digitalocean, storage, spaces, object-storage, s3, buckets]
+transport: http
+url: https://spaces.mcp.digitalocean.com/mcp
+headers:
+  - "Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - spaces.mcp.digitalocean.com

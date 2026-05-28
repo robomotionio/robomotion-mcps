@@ -1,0 +1,25 @@
+type: mcp
+name: google-gcloud-cli
+title: gcloud CLI MCP
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: DevOps
+summary: Google's gcloud CLI MCP server. Wraps the locally installed gcloud CLI
+  so agents can run Google Cloud commands for compute, storage, IAM, Cloud Run,
+  GKE, and more. Runs through the credstdio bridge, spawned host-side with the
+  host's gcloud Application Default Credentials (or an optional service-account
+  key path injected host-side), so the secret never enters the agent sandbox.
+source_url: https://github.com/googleapis/gcloud-mcp/tree/main/packages/gcloud-mcp
+tags: [google-cloud, gcp, gcloud, devops, cloud, cli, stdio]
+transport: stdio
+command: npx
+args: ["-y", "@google-cloud/gcloud-mcp"]
+timeout: 300
+# Upstream Google Cloud hosts the host-side gcloud CLI reaches when executing
+# commands; the credstdio bridge runs gcloud host-side and only the MCP
+# JSON-RPC stream crosses into the sandbox.
+egress_hosts:
+  - googleapis.com
+  - oauth2.googleapis.com
+  - accounts.google.com

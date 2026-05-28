@@ -1,0 +1,24 @@
+type: mcp
+name: gcp-spanner
+title: Spanner (Google Cloud)
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: Databases
+summary: Google Cloud's managed remote MCP server for Cloud Spanner. Tools to
+  explore instances and databases, run SQL/GQL queries, and inspect schema over
+  the streamable-HTTP transport. Rides Robomotion credproxy — the OAuth 2.0
+  access token is swapped into the Authorization header at egress; the sandbox
+  sees only a placeholder.
+source_url: https://docs.cloud.google.com/spanner/docs/use-spanner-mcp
+tags: [google-cloud, gcp, spanner, database, sql, gql, remote]
+transport: http
+url: https://spanner.googleapis.com/mcp
+headers:
+  - "Authorization=Bearer ${GOOGLE_CLOUD_ACCESS_TOKEN}"
+  - "x-goog-user-project=${GOOGLE_CLOUD_PROJECT}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - spanner.googleapis.com

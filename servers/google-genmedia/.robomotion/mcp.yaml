@@ -1,0 +1,25 @@
+type: mcp
+name: google-genmedia
+title: Genmedia (Imagen / Veo)
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: AI / ML
+summary: Google Cloud Vertex AI generative-media MCP servers. Tools for image
+  generation and editing with Imagen and video creation with Veo (sibling
+  binaries also cover Gemini image, Chirp 3 TTS, and Lyria music). Runs as a
+  stdio subprocess inside the agent sandbox using the bundled Go binary; the
+  Google Cloud project and service-account credentials enter the container only
+  as credstdio-injected values, so the sandbox never holds the secret.
+source_url: https://github.com/GoogleCloudPlatform/vertex-ai-creative-studio/tree/main/experiments/mcp-genmedia
+tags: [google, vertex-ai, imagen, veo, image-generation, video-generation, gcp, stdio]
+transport: stdio
+command: mcp-imagen-go
+args: []
+timeout: 300
+# Hosts the requests egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - aiplatform.googleapis.com
+  - us-central1-aiplatform.googleapis.com
+  - storage.googleapis.com

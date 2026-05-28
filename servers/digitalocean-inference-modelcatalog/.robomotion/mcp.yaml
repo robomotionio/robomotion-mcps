@@ -1,0 +1,22 @@
+type: mcp
+name: digitalocean-inference-modelcatalog
+title: DigitalOcean Inference Model Catalog
+author: DigitalOcean
+version: 1.0.0
+license: MIT
+category: AI / ML
+summary: DigitalOcean's hosted Inference Model Catalog MCP server. Tools to browse
+  the Inference model catalog, search for models, and fetch model cards. Rides
+  Robomotion credproxy — the personal access token is swapped into the
+  Authorization header at egress; the sandbox sees only a placeholder.
+source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+tags: [digitalocean, inference, models, model-catalog, ai, ml]
+transport: http
+url: https://inference-modelcatalog.mcp.digitalocean.com/mcp
+headers:
+  - "Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - inference-modelcatalog.mcp.digitalocean.com

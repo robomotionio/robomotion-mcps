@@ -1,0 +1,22 @@
+type: mcp
+name: microsoft-fabric
+title: Microsoft Fabric
+author: Microsoft
+version: 1.0.0
+license: MIT
+category: Analytics
+summary: Microsoft's local-first Fabric MCP server. Tools for exploring Fabric
+  REST API specifications, item definitions, and development best practices to
+  build and operate Fabric workloads. Runs as a stdio subprocess inside the agent
+  sandbox via the bundled runtimes; it is local-first and requires no credentials,
+  so no secret enters the sandbox.
+source_url: https://github.com/microsoft/mcp/tree/main/servers/Fabric.Mcp.Server
+tags: [microsoft, fabric, analytics, data, onelake, rest-api, stdio]
+transport: stdio
+command: npx
+args: ["-y", "@microsoft/fabric-mcp@latest", "server", "start", "--mode", "all"]
+timeout: 300
+# Local-first server: it serves Fabric API specifications and guidance from the
+# bundled package and does not connect to your Fabric environment, so no fixed
+# egress allowlist ships here.
+egress_hosts: []

@@ -1,0 +1,23 @@
+type: mcp
+name: gcp-developer-knowledge
+title: Google Developer Knowledge API
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: Developer Tools
+summary: Google's managed remote MCP server for the Developer Knowledge API.
+  Tools that ground answers in official Google developer and Google Cloud
+  documentation, code samples, and product references. Rides Robomotion
+  credproxy — the Google Cloud API key is swapped into the X-Goog-Api-Key
+  header at egress; the sandbox sees only a placeholder.
+source_url: https://developers.google.com/knowledge/mcp
+tags: [google, gcp, google-cloud, documentation, knowledge, developer-tools]
+transport: http
+url: https://developerknowledge.googleapis.com/mcp
+headers:
+  - "X-Goog-Api-Key=${GOOGLE_API_KEY}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - developerknowledge.googleapis.com

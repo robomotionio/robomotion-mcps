@@ -1,0 +1,23 @@
+type: mcp
+name: digitalocean-networking
+title: DigitalOcean Networking
+author: DigitalOcean
+version: 1.0.0
+license: MIT
+category: DevOps
+summary: DigitalOcean's hosted "networking" MCP server. Tools to manage domains,
+  DNS records, certificates, firewalls, load balancers, reserved IPs, BYOIP
+  prefixes, VPCs, and CDNs. Rides Robomotion credproxy — the personal access
+  token is swapped into the Authorization header at egress; the sandbox sees
+  only a placeholder.
+source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+tags: [digitalocean, devops, cloud, networking, dns, firewall, load-balancer, vpc, cdn]
+transport: http
+url: https://networking.mcp.digitalocean.com/mcp
+headers:
+  - "Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - networking.mcp.digitalocean.com

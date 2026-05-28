@@ -147,6 +147,15 @@ def read_server(repo_root: str, server_rel: str) -> dict:
         "url": my.get("url", "") or "",
         "headers": my.get("headers", []) or [],
         "timeout": int(my.get("timeout", 300) or 300),
+        # ---- egress allowlist ----
+        # API host(s) this server's credential may be sent to. credproxy binds
+        # each credential placeholder to this list and refuses to substitute it
+        # for any other destination (the placeholder-replay defense). Exact host
+        # or leading "*." wildcard. Empty/absent => no binding (relies on the
+        # deskbot's CREDPROXY_DEST_ENFORCE staying in warn during rollout);
+        # appropriate for servers whose destination is user-configured (e.g. a
+        # self-hosted endpoint), where the http URL host is bound automatically.
+        "egress_hosts": my.get("egress_hosts", []) or [],
         # ---- env contract (verbatim from env.required / env.optional) ----
         "env": {
             "required": env_names(os.path.join(server_abs, "env.required")),

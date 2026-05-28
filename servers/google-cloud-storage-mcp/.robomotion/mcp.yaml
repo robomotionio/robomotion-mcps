@@ -1,0 +1,23 @@
+type: mcp
+name: google-cloud-storage-mcp
+title: Google Cloud Storage (open-source)
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: Storage
+summary: Google's open-source Cloud Storage MCP server. Tools for buckets and
+  objects — list, read, upload, manage, and inspect Google Cloud Storage. Runs
+  as a stdio subprocess inside the agent sandbox via npx; authenticates with
+  Application Default Credentials. The service-account key enters the container
+  only as a credproxy placeholder, swapped for the real value at TLS egress, so
+  the sandbox never holds the secret.
+source_url: https://github.com/googleapis/gcloud-mcp/tree/main/packages/storage-mcp
+tags: [google-cloud, gcs, storage, buckets, objects, gcp, stdio]
+transport: stdio
+command: npx
+args: ["-y", "@google-cloud/storage-mcp"]
+timeout: 300
+# Hosts the credentials may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - storage.googleapis.com

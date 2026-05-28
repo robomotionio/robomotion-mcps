@@ -1,0 +1,23 @@
+type: mcp
+name: gcp-bigquery
+title: BigQuery (Google Cloud)
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: Databases
+summary: Google Cloud's fully managed remote BigQuery MCP server. Tools to list
+  datasets and tables, inspect schemas, and run SQL queries against BigQuery over
+  streamable HTTP. Rides Robomotion credproxy — the Google Cloud OAuth access
+  token is swapped into the Authorization header at egress; the sandbox sees only
+  a placeholder.
+source_url: https://docs.cloud.google.com/bigquery/docs/use-bigquery-mcp
+tags: [bigquery, google-cloud, gcp, databases, sql, analytics, data-warehouse]
+transport: http
+url: https://bigquery.googleapis.com/mcp
+headers:
+  - "Authorization=Bearer ${GCP_ACCESS_TOKEN}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - bigquery.googleapis.com

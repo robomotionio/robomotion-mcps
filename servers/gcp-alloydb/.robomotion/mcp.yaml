@@ -1,0 +1,23 @@
+type: mcp
+name: gcp-alloydb
+title: AlloyDB for PostgreSQL (Google Cloud)
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: Databases
+summary: Google Cloud's managed remote MCP server for AlloyDB for PostgreSQL.
+  Tools to explore clusters and instances, run SQL, and work with AlloyDB AI
+  features. Rides Robomotion credproxy — the Google Cloud access token is
+  swapped into the Authorization header at egress; the sandbox sees only a
+  placeholder.
+source_url: https://docs.cloud.google.com/alloydb/docs/ai/use-alloydb-mcp
+tags: [google-cloud, gcp, alloydb, postgresql, database, sql, ai]
+transport: http
+url: https://alloydb.googleapis.com/mcp
+headers:
+  - "Authorization=Bearer ${GOOGLE_CLOUD_ACCESS_TOKEN}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - alloydb.googleapis.com

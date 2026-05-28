@@ -1,0 +1,24 @@
+type: mcp
+name: gcp-cloud-run
+title: Cloud Run (Google Cloud)
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: DevOps
+summary: Google Cloud's managed remote MCP server for Cloud Run. Tools to deploy,
+  inspect, and manage Cloud Run services, revisions, and jobs via the Cloud Run
+  Admin API. Rides Robomotion credproxy — the Google Cloud access token is
+  swapped into the Authorization header at egress and the sandbox sees only a
+  placeholder, so the secret never enters the container.
+source_url: https://docs.cloud.google.com/run/docs/reference/mcp
+tags: [google-cloud, gcp, cloud-run, devops, deploy, serverless, containers]
+transport: http
+url: https://run.googleapis.com/mcp
+headers:
+  - "Authorization=Bearer ${GOOGLE_CLOUD_ACCESS_TOKEN}"
+  - "x-goog-user-project=${GOOGLE_CLOUD_PROJECT}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - run.googleapis.com

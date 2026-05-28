@@ -1,0 +1,22 @@
+type: mcp
+name: markitdown
+title: Markitdown
+author: Microsoft
+version: 1.0.0
+license: MIT
+category: Developer Tools
+summary: Microsoft's MarkItDown MCP server. A tool that converts files and URIs
+  (PDF, Office documents, images, audio, HTML, and more) into clean Markdown for
+  LLM consumption. Runs as a stdio subprocess inside the agent sandbox; no
+  external credential is required, so nothing is bound and the sandbox never
+  holds a secret.
+source_url: https://github.com/microsoft/markitdown
+tags: [markdown, conversion, documents, pdf, office, ocr, developer-tools, stdio]
+transport: stdio
+command: uvx
+args: ["markitdown-mcp"]
+timeout: 300
+# Conversion runs locally on files/URIs the agent supplies; the server makes no
+# fixed outbound API calls and ships no credential, so no egress allowlist is
+# declared here.
+egress_hosts: []

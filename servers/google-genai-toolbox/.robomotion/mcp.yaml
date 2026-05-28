@@ -1,0 +1,24 @@
+type: mcp
+name: google-genai-toolbox
+title: MCP Toolbox for Databases
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: Databases
+summary: Google's open-source MCP Toolbox for Databases. Prebuilt generic tools
+  (list_tables, execute_sql, and more) for PostgreSQL and many other engines via
+  the --prebuilt flag. Runs as a stdio subprocess inside the agent sandbox; the
+  database host, name, and credentials enter the container only as credproxy
+  placeholders, swapped for the real values at TLS egress, so the sandbox never
+  holds the secret.
+source_url: https://github.com/googleapis/genai-toolbox
+tags: [database, postgres, sql, bigquery, cloud-sql, alloydb, data, stdio]
+transport: stdio
+command: npx
+args: ["-y", "@toolbox-sdk/server", "--prebuilt=postgres", "--stdio"]
+timeout: 300
+# Destination is the user's own database server (configured at hire time), so
+# no fixed egress allowlist ships here. The deskbot binds the placeholder to
+# the configured database host where it can derive one; otherwise the warn-mode
+# rollout flag (CREDPROXY_DEST_ENFORCE) keeps it working until backfilled.
+egress_hosts: []

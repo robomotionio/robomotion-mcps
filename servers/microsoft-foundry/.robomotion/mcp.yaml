@@ -1,0 +1,24 @@
+type: mcp
+name: microsoft-foundry
+title: Microsoft Foundry
+author: Microsoft
+version: 1.0.0
+license: MIT
+category: AI / ML
+summary: Foundry MCP Server (preview), Microsoft's cloud-hosted MCP endpoint for
+  Azure AI Foundry. Exposes curated tools to read and write against Foundry
+  services — models, projects, and resources — without calling backend APIs
+  directly. Authentication is interactive Microsoft Entra ID OAuth performed by
+  the MCP client (no static token is bound), so no credproxy header placeholder
+  ships; the agent never holds a long-lived secret.
+source_url: https://learn.microsoft.com/azure/ai-foundry/mcp/get-started
+tags: [microsoft, azure, ai-foundry, foundry, ai, ml, models, entra, oauth]
+transport: http
+url: https://mcp.ai.azure.com
+headers: []
+timeout: 300
+# Fixed vendor endpoint. No credential placeholder is injected (auth is
+# interactive Entra ID OAuth), but the destination host is pinned so egress is
+# constrained to the known Foundry MCP endpoint.
+egress_hosts:
+  - mcp.ai.azure.com

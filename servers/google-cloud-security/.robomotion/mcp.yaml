@@ -1,0 +1,26 @@
+type: mcp
+name: google-cloud-security
+title: Google Cloud Security
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: Security
+summary: Google Security Operations (Chronicle) MCP server from the google/mcp-security
+  suite. Tools for threat detection, UDM search, detection rules, alerts, and case
+  triage across your Chronicle SecOps instance. Runs as a stdio subprocess inside
+  the agent sandbox; the service-account key and Chronicle identifiers enter the
+  container only as credproxy placeholders, swapped for the real values at TLS
+  egress, so the sandbox never holds the secret.
+source_url: https://github.com/google/mcp-security
+tags: [google, security, chronicle, secops, siem, threat-detection, udm, stdio]
+transport: stdio
+command: uvx
+args: ["--from", "google-secops-mcp", "secops_mcp"]
+timeout: 300
+# The Chronicle SecOps data-plane host is region-specific
+# ({REGION}-chronicle.googleapis.com, derived from CHRONICLE_REGION at hire
+# time), so no fixed egress allowlist ships here. The deskbot binds the
+# placeholders to the configured tenant host where it can derive one; otherwise
+# the warn-mode rollout flag (CREDPROXY_DEST_ENFORCE) keeps it working until
+# backfilled.
+egress_hosts: []

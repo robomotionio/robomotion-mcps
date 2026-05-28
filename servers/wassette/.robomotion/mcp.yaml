@@ -1,0 +1,22 @@
+type: mcp
+name: wassette
+title: Wassette
+author: Microsoft
+version: 1.0.0
+license: MIT
+category: Developer Tools
+summary: Microsoft's security-oriented runtime that loads and runs WebAssembly
+  Components as MCP tools, sandboxed by the Wasmtime engine. Runs as a stdio
+  subprocess inside the agent sandbox via the credstdio bridge. No credentials
+  are required; the secret-isolation guarantees still hold because nothing
+  sensitive ever enters the container.
+source_url: https://github.com/microsoft/wassette
+tags: [wasm, webassembly, wasmtime, components, sandbox, developer-tools, stdio]
+transport: stdio
+command: wassette
+args: ["run"]
+timeout: 300
+# Wassette runs Wasm Components locally; it has no fixed upstream API host of its
+# own, and any network egress comes from the components a user loads. No fixed
+# egress allowlist ships here.
+egress_hosts: []

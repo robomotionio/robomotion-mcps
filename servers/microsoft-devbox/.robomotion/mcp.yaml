@@ -1,0 +1,26 @@
+type: mcp
+name: microsoft-devbox
+title: Microsoft Dev Box
+author: Microsoft
+version: 1.0.0
+license: MIT
+category: DevOps
+summary: Microsoft Dev Box MCP server. Tools to list projects and pools, create,
+  start, stop, and delete dev boxes, and manage shutdown schedules and
+  customizations through the Dev Box control plane. Runs as a stdio subprocess
+  inside the agent sandbox; it authenticates via DefaultAzureCredential (Azure
+  CLI / Windows SSO / managed identity), so no static token credential is
+  injected and the sandbox never holds a long-lived secret.
+source_url: https://github.com/microsoft/devbox-mcp-server
+tags: [microsoft, azure, dev-box, devops, cloud, dev-environments, stdio]
+transport: stdio
+command: npx
+args: ["-y", "@microsoft/devbox-mcp@latest"]
+timeout: 300
+# Hosts the server reaches for the Dev Box control plane and ARM. No static
+# token is substituted here (auth rides DefaultAzureCredential), so this is an
+# egress allowlist only; credproxy refuses traffic to other destinations.
+egress_hosts:
+  - management.azure.com
+  - devcenter.azure.com
+  - login.microsoftonline.com

@@ -1,0 +1,22 @@
+type: mcp
+name: google-dart-mcp
+title: Flutter / Dart MCP
+author: Google
+version: 1.0.0
+license: BSD-3-Clause
+category: Developer Tools
+summary: The official Dart MCP server, shipped with the Dart SDK. Tools to
+  analyze projects, run tests, manage pub dependencies, search pub.dev, and
+  drive the Dart Tooling Daemon for Dart and Flutter apps. Runs as a stdio
+  subprocess inside the agent sandbox via the bundled Dart SDK; no credential
+  is required, so nothing sensitive ever enters the sandbox.
+source_url: https://github.com/dart-lang/ai/tree/main/pkgs/dart_mcp_server
+tags: [dart, flutter, developer-tools, pub, testing, mcp, stdio]
+transport: stdio
+command: dart
+args: ["mcp-server"]
+timeout: 300
+# Outbound host the server may reach (pub.dev package search). No credential is
+# injected; the host is listed for egress visibility only.
+egress_hosts:
+  - pub.dev

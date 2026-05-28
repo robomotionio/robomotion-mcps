@@ -74,6 +74,34 @@ while IFS= read -r my; do
   check_env_file "$server_dir/env.required"
   check_env_file "$server_dir/env.optional"
 
+  # egress_hosts (optional): each list item must be a bare host or a leading
+  # "*." wildcard — no scheme, no path, no port. credproxy binds the
+  # credential placeholder to these and refuses substitution elsewhere.
+  egress=$(awk '
+    /^egress_hosts:[[:space:]]*\[/ {
+      line=$0; sub(/^egress_hosts:[[:space:]]*\[/,"",line); sub(/\].*$/,"",line);
+      n=split(line, a, ","); for (i=1;i<=n;i++){gsub(/[[:space:]"'"'"']/,"",a[i]); if(a[i]!="") print a[i]} next
+    }
+    /^egress_hosts:[[:space:]]*$/ {inblk=1; next}
+    inblk && /^[[:space:]]*-[[:space:]]*/ {sub(/^[[:space:]]*-[[:space:]]*/,""); gsub(/["'"'"']/,""); print; next}
+    inblk && /^[^[:space:]]/ {inblk=0}
+  ' "$my")
+  while IFS= read -r host; do
+    [ -z "$host" ] && continue
+    [ "$host" = "[]" ] && continue
+    case "$host" in
+      *://*|*/*|*:*)
+        echo "    FAIL: egress_hosts entry '$host' must be a bare host (no scheme/path/port)"; fail=1; continue;;
+    esac
+    case "$host" in
+      *\**)  # contains a wildcard — only a leading "*." is allowed
+        case "$host" in
+          \*.?*) : ;;
+          *) echo "    FAIL: egress_hosts wildcard '$host' must be a leading '*.' (e.g. *.example.com)"; fail=1;;
+        esac;;
+    esac
+  done <<< "$egress"
+
   echo "    transport: ${transport:-?}"
 done < <(find . \( -name .git -o -name node_modules \) -prune -o -path '*/.robomotion/mcp.yaml' -print | sort)
 

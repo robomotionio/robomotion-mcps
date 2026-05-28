@@ -1,0 +1,27 @@
+type: mcp
+name: google-cloud-run-deploy
+title: Cloud Run (open-source deploy MCP)
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: DevOps
+summary: Google's open-source Cloud Run MCP server. Tools to deploy code, list
+  and inspect Cloud Run services, read service logs, and manage projects on
+  Google Cloud. Runs as a stdio subprocess inside the agent sandbox via npx;
+  the Google Cloud project/region identifiers and Application Default
+  Credentials enter the container only as credproxy placeholders, swapped for
+  the real values at TLS egress, so the sandbox never holds the secret.
+source_url: https://github.com/GoogleCloudPlatform/cloud-run-mcp
+tags: [google-cloud, gcp, cloud-run, devops, deploy, serverless, stdio]
+transport: stdio
+command: npx
+args: ["-y", "@google-cloud/cloud-run-mcp"]
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - run.googleapis.com
+  - cloudresourcemanager.googleapis.com
+  - logging.googleapis.com
+  - cloudbuild.googleapis.com
+  - oauth2.googleapis.com

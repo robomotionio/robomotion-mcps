@@ -1,0 +1,22 @@
+type: mcp
+name: nuget
+title: NuGet MCP Server
+author: Microsoft
+version: 1.0.0
+license: MIT
+category: Developer Tools
+summary: NuGet's official MCP server. Tools for searching the nuget.org gallery,
+  inspecting package metadata and versions, and managing package dependencies.
+  Runs as a stdio subprocess inside the agent sandbox via the bundled dnx
+  runtime. No credential is required — it talks only to the public nuget.org
+  feed, so nothing sensitive enters the sandbox.
+source_url: https://www.nuget.org/packages/NuGet.Mcp.Server
+tags: [nuget, dotnet, packages, dependencies, developer-tools, stdio]
+transport: stdio
+command: dnx
+args: ["NuGet.Mcp.Server", "--source", "https://api.nuget.org/v3/index.json", "--yes"]
+timeout: 300
+# Hosts the server reaches at runtime. No credential is injected; this is the
+# public nuget.org package feed.
+egress_hosts:
+  - api.nuget.org

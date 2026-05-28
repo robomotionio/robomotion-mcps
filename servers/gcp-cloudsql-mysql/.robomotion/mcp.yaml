@@ -1,0 +1,24 @@
+type: mcp
+name: gcp-cloudsql-mysql
+title: Cloud SQL for MySQL (Google Cloud)
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: Databases
+summary: Google's managed remote MCP server for Cloud SQL for MySQL. Tools to
+  create, list, and manage MySQL instances and to run SQL through the Cloud SQL
+  Admin API. Rides Robomotion credproxy — the Google Cloud OAuth access token is
+  swapped into the Authorization header at egress to sqladmin.googleapis.com; the
+  sandbox sees only a placeholder and never holds the secret.
+source_url: https://docs.cloud.google.com/sql/docs/mysql/use-cloudsql-mcp
+tags: [google-cloud, gcp, cloud-sql, mysql, database, sql, oauth]
+transport: http
+url: https://sqladmin.googleapis.com/mcp
+headers:
+  - "Authorization=Bearer ${GOOGLE_CLOUD_ACCESS_TOKEN}"
+  - "x-goog-user-project=${GOOGLE_CLOUD_PROJECT}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - sqladmin.googleapis.com

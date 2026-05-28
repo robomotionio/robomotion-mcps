@@ -1,0 +1,23 @@
+type: mcp
+name: digitalocean-insights
+title: DigitalOcean Insights
+author: DigitalOcean
+version: 1.0.0
+license: MIT
+category: DevOps
+summary: DigitalOcean's hosted "insights" MCP server. Tools to monitor your
+  resources and endpoints and alert you when they're slow, unavailable, or their
+  SSL certificates are expiring. Rides Robomotion credproxy — the personal
+  access token is swapped into the Authorization header at egress; the sandbox
+  sees only a placeholder.
+source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+tags: [digitalocean, devops, cloud, monitoring, alerting, uptime, ssl, insights]
+transport: http
+url: https://insights.mcp.digitalocean.com/mcp
+headers:
+  - "Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - insights.mcp.digitalocean.com

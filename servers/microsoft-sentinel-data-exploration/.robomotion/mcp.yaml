@@ -1,0 +1,23 @@
+type: mcp
+name: microsoft-sentinel-data-exploration
+title: Microsoft Sentinel Data Exploration
+author: Microsoft
+version: 1.0.0
+license: MIT
+category: Security
+summary: Microsoft Sentinel Data Exploration MCP server. Tools to search the data
+  lake table catalog, run KQL queries, list workspaces, and run AI entity analysis
+  over URL, domain, and user entities. Authenticates with an interactive Microsoft
+  Entra sign-in (Security Reader/Operator/Administrator role), so no static token
+  is configured here; the sandbox never holds a long-lived secret.
+source_url: https://learn.microsoft.com/en-us/azure/sentinel/datalake/sentinel-mcp-data-exploration-tool
+tags: [microsoft-sentinel, security, siem, data-lake, kql, threat-hunting, entra]
+transport: http
+url: https://sentinel.microsoft.com/mcp/data-exploration
+headers: []
+timeout: 300
+# Endpoint host is fixed (sentinel.microsoft.com). Authentication is an
+# interactive Microsoft Entra OAuth flow rather than a static header token, so
+# no credential placeholder ships; the egress allowlist still pins the host.
+egress_hosts:
+  - sentinel.microsoft.com

@@ -1,0 +1,25 @@
+type: mcp
+name: gcp-firestore
+title: Firestore (Google Cloud)
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: Databases
+summary: Google Cloud's managed remote MCP server for Firestore in Native mode.
+  Tools to query, read, and write documents and collections, and to inspect
+  database structure, over the streamable-HTTP transport. Authentication uses
+  OAuth 2.0 with IAM; a Google Cloud access token rides Robomotion credproxy —
+  the token is swapped into the Authorization header at egress and the sandbox
+  sees only a placeholder.
+source_url: https://docs.cloud.google.com/firestore/native/docs/use-firestore-mcp
+tags: [firestore, google-cloud, gcp, database, nosql, documents, http]
+transport: http
+url: https://firestore.googleapis.com/mcp
+headers:
+  - "Authorization=Bearer ${GOOGLE_CLOUD_ACCESS_TOKEN}"
+  - "x-goog-user-project=${GOOGLE_CLOUD_PROJECT}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - firestore.googleapis.com

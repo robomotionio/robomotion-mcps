@@ -1,0 +1,25 @@
+type: mcp
+name: microsoft-fabric-rti
+title: Microsoft Fabric Real-Time Intelligence
+author: Microsoft
+version: 1.0.0
+license: MIT
+category: Analytics
+summary: Microsoft Fabric Real-Time Intelligence MCP server. Tools for querying
+  and managing Kusto / Eventhouse (KQL) databases and Fabric RTI workloads. Runs
+  as a stdio subprocess inside the agent sandbox via uvx; authentication uses the
+  Azure Identity DefaultAzureCredential chain and any cluster identifiers enter
+  the container only as credproxy placeholders, swapped for the real values at
+  TLS egress, so the sandbox never holds the secret.
+source_url: https://github.com/microsoft/fabric-rti-mcp
+tags: [microsoft, fabric, real-time-intelligence, kusto, kql, eventhouse, analytics, stdio]
+transport: stdio
+command: uvx
+args: ["microsoft-fabric-rti-mcp"]
+timeout: 300
+# Destination is the user's own Kusto/Eventhouse cluster (KUSTO_SERVICE_URI,
+# configured at hire time) plus the Fabric API, so no fixed egress allowlist
+# ships here. The deskbot binds the placeholder to the configured cluster host
+# where it can derive one; otherwise the warn-mode rollout flag
+# (CREDPROXY_DEST_ENFORCE) keeps it working until backfilled.
+egress_hosts: []

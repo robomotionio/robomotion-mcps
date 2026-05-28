@@ -1,0 +1,21 @@
+type: mcp
+name: google-go-gopls
+title: Go (gopls MCP)
+author: Google
+version: 1.0.0
+license: BSD-3-Clause
+category: Developer Tools
+summary: The Go language server (gopls) running in detached MCP mode. Tools for
+  navigating, analyzing, and editing Go code — symbol search, references,
+  diagnostics, and workspace context. Runs as a stdio subprocess inside the
+  agent sandbox via the bundled Go toolchain; it operates purely on local
+  source and requires no credentials, so no secret enters the sandbox.
+source_url: https://go.dev/gopls/features/mcp
+tags: [go, golang, gopls, language-server, developer-tools, code-analysis, stdio]
+transport: stdio
+command: gopls
+args: ["mcp"]
+timeout: 300
+# gopls is a local language server that analyzes on-disk Go source; it makes no
+# outbound API calls and carries no credential, so there is no egress allowlist.
+egress_hosts: []

@@ -1,0 +1,22 @@
+type: mcp
+name: microsoft-learn
+title: Microsoft Learn
+author: Microsoft
+version: 1.0.0
+license: MIT
+category: Developer Tools
+summary: Microsoft's official remote MCP server for Microsoft Learn. Tools to
+  search the official documentation, fetch complete articles, and search code
+  samples from the Learn knowledge service. The public docs endpoint requires
+  no credential; the agent connects over streamable HTTP and no token enters
+  the sandbox.
+source_url: https://learn.microsoft.com/training/support/mcp
+tags: [microsoft, microsoft-learn, docs, documentation, search, code-samples]
+transport: http
+url: https://learn.microsoft.com/api/mcp
+headers: []
+timeout: 300
+# Public endpoint, no credential to substitute, but the destination host is
+# still pinned so the agent can only reach Microsoft Learn.
+egress_hosts:
+  - learn.microsoft.com

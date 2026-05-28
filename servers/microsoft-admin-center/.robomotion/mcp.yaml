@@ -1,0 +1,23 @@
+type: mcp
+name: microsoft-admin-center
+title: Microsoft Admin Center
+author: Microsoft
+version: 1.0.0
+license: MIT
+category: Productivity
+summary: Microsoft Admin Center MCP server (Agent365). Tools for tenant
+  administration actions backed by the Microsoft Admin Center APIs. The endpoint
+  host is fixed but your Microsoft Entra tenant ID is bound into the request path
+  at hire time. Rides Robomotion credproxy — the sandbox sees only a placeholder
+  for the tenant identifier, never a real secret.
+source_url: https://github.com/microsoft/mcp
+tags: [microsoft-365, admin, admin-center, microsoft-graph, agent365, administration, tenant]
+transport: http
+url: https://agent365.svc.cloud.microsoft/agents/tenants/${MICROSOFT_TENANT_ID}/servers/mcp_AdminTools
+headers: []
+timeout: 300
+# Endpoint host is fixed (agent365.svc.cloud.microsoft); only the tenant id
+# lives in the path. credproxy refuses to substitute the placeholder for any
+# other destination (placeholder-replay defense).
+egress_hosts:
+  - agent365.svc.cloud.microsoft

@@ -1,0 +1,21 @@
+type: mcp
+name: digitalocean-docs
+title: DigitalOcean Docs
+author: DigitalOcean
+version: 1.0.0
+license: MIT
+category: Developer Tools
+summary: DigitalOcean's hosted documentation MCP server. Search and retrieve
+  DigitalOcean's public product documentation directly from the agent. No API
+  token is required — the endpoint is public, so no credential ever enters the
+  sandbox.
+source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+tags: [digitalocean, docs, documentation, search, devops, http]
+transport: http
+url: https://docs.mcp.digitalocean.com/mcp
+headers: []
+timeout: 300
+# Public docs endpoint — no credential is sent. egress_hosts still pins the
+# destination the agent may reach.
+egress_hosts:
+  - docs.mcp.digitalocean.com

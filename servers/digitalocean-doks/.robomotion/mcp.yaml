@@ -1,0 +1,22 @@
+type: mcp
+name: digitalocean-doks
+title: DigitalOcean Kubernetes (DOKS)
+author: DigitalOcean
+version: 1.0.0
+license: MIT
+category: DevOps
+summary: DigitalOcean's hosted MCP server for DOKS. Tools to manage DigitalOcean
+  Kubernetes clusters and node pools. Rides Robomotion credproxy — the personal
+  access token is swapped into the Authorization header at egress; the sandbox
+  sees only a placeholder.
+source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+tags: [digitalocean, devops, kubernetes, doks, clusters, node-pools]
+transport: http
+url: https://doks.mcp.digitalocean.com/mcp
+headers:
+  - "Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - doks.mcp.digitalocean.com

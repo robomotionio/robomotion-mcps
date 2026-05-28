@@ -1,0 +1,26 @@
+type: mcp
+name: microsoft-dataverse
+title: Microsoft Dataverse
+author: Microsoft
+version: 1.0.0
+license: MIT
+category: Productivity
+summary: Microsoft Dataverse MCP server. Tools to list and describe tables,
+  query and manage records, and work with schema (tables, columns,
+  relationships, option sets) over the Dataverse Web API. Runs as a stdio
+  local-proxy subprocess (the @microsoft/dataverse npm package) inside the
+  agent sandbox; the Dataverse environment URL enters the container only as a
+  credproxy placeholder, swapped for the real value at TLS egress, so the
+  sandbox never holds the secret.
+source_url: https://learn.microsoft.com/power-apps/maker/data-platform/data-platform-mcp
+tags: [microsoft, dataverse, power-platform, dynamics, crm, tables, records, stdio]
+transport: stdio
+command: npx
+args: ["-y", "@microsoft/dataverse", "mcp", "${DATAVERSE_ENVIRONMENT_URL}"]
+timeout: 300
+# Destination is the user's own Dataverse environment (the per-tenant
+# *.crm.dynamics.com org URL configured at hire time), so no fixed egress
+# allowlist ships here. The deskbot binds the placeholder to the configured
+# environment host where it can derive one; otherwise the warn-mode rollout
+# flag (CREDPROXY_DEST_ENFORCE) keeps it working until backfilled.
+egress_hosts: []

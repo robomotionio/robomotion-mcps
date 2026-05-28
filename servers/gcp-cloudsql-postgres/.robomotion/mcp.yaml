@@ -1,0 +1,24 @@
+type: mcp
+name: gcp-cloudsql-postgres
+title: Cloud SQL for PostgreSQL (Google Cloud)
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: Databases
+summary: Google's managed remote MCP server for Cloud SQL for PostgreSQL. Tools
+  to create and manage instances, databases, users, backups, and to run SQL
+  against your Cloud SQL instances via the Cloud SQL Admin API. Rides Robomotion
+  credproxy — the Google Cloud access token is swapped into the Authorization
+  header at egress; the sandbox sees only a placeholder.
+source_url: https://docs.cloud.google.com/sql/docs/postgres/use-cloudsql-mcp
+tags: [google-cloud, gcp, cloud-sql, postgres, postgresql, database, sql]
+transport: http
+url: https://sqladmin.googleapis.com/mcp
+headers:
+  - "Authorization=Bearer ${GOOGLE_CLOUD_ACCESS_TOKEN}"
+  - "x-goog-user-project=${GOOGLE_CLOUD_PROJECT}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - sqladmin.googleapis.com

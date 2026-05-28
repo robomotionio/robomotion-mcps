@@ -1,0 +1,22 @@
+type: mcp
+name: playwright
+title: Playwright
+author: Microsoft
+version: 1.0.0
+license: Apache-2.0
+category: Developer Tools
+summary: Microsoft's Playwright MCP server. Tools to drive a real browser —
+  navigate, click, type, fill forms, take snapshots and screenshots, and run
+  end-to-end web automation using Playwright's accessibility tree. Runs as a
+  stdio subprocess inside the agent sandbox via the credstdio bridge. No external
+  credential is required, so nothing is bound at hire time.
+source_url: https://github.com/microsoft/playwright-mcp
+tags: [playwright, browser, automation, e2e, testing, web, scraping, stdio]
+transport: stdio
+command: npx
+args: ["@playwright/mcp@latest"]
+timeout: 300
+# This server drives a local browser and has no fixed upstream API host; the
+# destinations are whatever pages the agent navigates to, so no egress allowlist
+# ships here.
+egress_hosts: []

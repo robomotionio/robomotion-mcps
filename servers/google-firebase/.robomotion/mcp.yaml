@@ -1,0 +1,29 @@
+type: mcp
+name: google-firebase
+title: Firebase (Gemini CLI extension)
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: DevOps
+summary: Firebase's official MCP server, bundled with the Firebase CLI. Tools for
+  Firestore, Authentication, Cloud Storage, Realtime Database, Cloud Messaging,
+  App Hosting, and project management. Runs as a stdio subprocess inside the
+  agent sandbox via npx; the service-account credentials enter the container only
+  as credproxy placeholders, swapped for the real values at TLS egress, so the
+  sandbox never holds the secret.
+source_url: https://github.com/firebase/firebase-tools/tree/master/src/mcp
+tags: [firebase, google, devops, firestore, auth, storage, messaging, stdio]
+transport: stdio
+command: npx
+args: ["-y", "firebase-tools@latest", "mcp"]
+timeout: 300
+# Hosts the credentials may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - firebase.googleapis.com
+  - firestore.googleapis.com
+  - identitytoolkit.googleapis.com
+  - firebasestorage.googleapis.com
+  - firebasedatabase.googleapis.com
+  - fcm.googleapis.com
+  - oauth2.googleapis.com

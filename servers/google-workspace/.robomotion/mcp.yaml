@@ -16,3 +16,8 @@ url: https://workspace-mcp.example.com/mcp
 headers:
   - "Authorization=Bearer ${GOOGLE_WORKSPACE_MCP_TOKEN}"
 timeout: 300
+# Destination is the user's own self-hosted Workspace MCP deployment (the URL
+# above is a placeholder edited at hire time), so no fixed egress allowlist
+# ships here. For http servers the deskbot binds the placeholder to the
+# configured URL host automatically.
+egress_hosts: []

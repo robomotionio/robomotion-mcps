@@ -1,0 +1,30 @@
+type: mcp
+name: microsoft-sql
+title: Microsoft SQL
+author: Microsoft
+version: 1.0.0
+license: MIT
+category: Databases
+summary: Microsoft's MSSQL MCP server. Tools to list tables, read schemas, run
+  queries, and modify data on SQL Server, Azure SQL, and Microsoft Fabric via a
+  connection. Runs as a stdio subprocess inside the agent sandbox; the database
+  connection details enter the container only as credproxy placeholders, swapped
+  for the real values host-side, so the sandbox never holds the secret.
+source_url: https://github.com/Azure-Samples/SQL-AI-samples/tree/main/MssqlMcp/Node
+tags: [microsoft, mssql, sql-server, azure-sql, fabric, database, sql, stdio]
+transport: stdio
+# PLACEHOLDER COMMAND: aka.ms/MssqlMcp resolves to Azure-Samples/SQL-AI-samples,
+# which ships the MSSQL MCP server as buildable source (Node + .NET), not a
+# published npx/dnx/uvx package. Upstream runs it as `node <repo>/dist/index.js`
+# after `npm install && npm run build`. No official package id is registered, so
+# the launch executable below is a marked placeholder pending a published build;
+# the env contract (SERVER_NAME / DATABASE_NAME / READONLY) is verified.
+command: node
+args: ["/opt/mssql-mcp/dist/index.js"]
+timeout: 300
+# Destination is the user's own SQL Server / Azure SQL / Fabric instance
+# (SERVER_NAME, configured at hire time), so no fixed egress allowlist ships
+# here. The deskbot binds the placeholder to the configured server host where it
+# can derive one; otherwise the warn-mode rollout flag (CREDPROXY_DEST_ENFORCE)
+# keeps it working until backfilled.
+egress_hosts: []

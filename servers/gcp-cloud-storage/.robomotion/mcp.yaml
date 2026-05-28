@@ -1,0 +1,23 @@
+type: mcp
+name: gcp-cloud-storage
+title: Cloud Storage (Google Cloud)
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: Storage
+summary: Google Cloud's managed remote MCP server for Cloud Storage. Tools for
+  buckets and objects — list, read, write, and manage storage resources via the
+  Cloud Storage API. Rides Robomotion credproxy — the Google Cloud OAuth2 access
+  token is swapped into the Authorization header at egress; the sandbox sees only
+  a placeholder.
+source_url: https://docs.cloud.google.com/storage/docs/reference/mcp
+tags: [google-cloud, gcp, cloud-storage, storage, buckets, objects, gcs]
+transport: http
+url: https://storage.googleapis.com/storage/mcp
+headers:
+  - "Authorization=Bearer ${GOOGLE_CLOUD_ACCESS_TOKEN}"
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - storage.googleapis.com

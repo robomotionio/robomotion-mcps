@@ -1,0 +1,24 @@
+type: mcp
+name: google-chrome-devtools
+title: Chrome DevTools MCP
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: Developer Tools
+summary: Google's Chrome DevTools MCP server. Tools to drive a Chrome browser —
+  navigate pages, inspect the DOM and network, capture performance traces and
+  screenshots, and run JavaScript via the DevTools protocol. Runs as a stdio
+  subprocess inside the agent sandbox; no credential is required, so nothing
+  enters the container and the sandbox never holds a secret.
+source_url: https://github.com/ChromeDevTools/chrome-devtools-mcp
+tags: [chrome, devtools, browser, automation, performance, debugging, stdio]
+transport: stdio
+command: npx
+args: ["-y", "chrome-devtools-mcp@latest"]
+timeout: 300
+# Egress depends on the pages the controlled Chrome instance visits, which are
+# user-driven, so no fixed allowlist ships here. The Chrome UX Report (CrUX)
+# API at chromeuxreport.googleapis.com is the only fixed Google endpoint and is
+# only contacted for performance insights (disable with --no-performance-crux).
+egress_hosts:
+  - chromeuxreport.googleapis.com

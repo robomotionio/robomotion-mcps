@@ -1,0 +1,25 @@
+type: mcp
+name: azure-resource-manager
+title: Azure Resource Manager
+author: Microsoft
+version: 1.0.0
+license: MIT
+category: DevOps
+summary: Microsoft's Azure Resource Manager (ARM) MCP Server (preview), a
+  cloud-hosted endpoint that gives agents first-class access to Azure
+  infrastructure — generate, validate, and run Azure Resource Graph queries and
+  deploy or manage ARM template deployments across all resource types.
+  Authentication is interactive Microsoft Entra ID OAuth performed by the MCP
+  client (no static token is bound), so no credproxy header placeholder ships;
+  the agent never holds a long-lived secret.
+source_url: https://github.com/Azure/Azure-Resource-Manager-MCP
+tags: [azure, microsoft, devops, cloud, arm, resource-graph, deployments, entra, oauth]
+transport: http
+url: https://mcp.management.azure.com
+headers: []
+timeout: 300
+# Fixed vendor endpoint. No credential placeholder is injected (auth is
+# interactive Entra ID OAuth), but the destination host is pinned so egress is
+# constrained to the known ARM MCP endpoint.
+egress_hosts:
+  - mcp.management.azure.com

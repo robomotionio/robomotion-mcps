@@ -1,0 +1,24 @@
+type: mcp
+name: microsoft-clarity
+title: Microsoft Clarity
+author: Microsoft
+version: 1.0.0
+license: MIT
+category: Analytics
+summary: Microsoft Clarity MCP server. Tools to query your Clarity project's
+  live insights via the Clarity Data Export API — traffic, engagement,
+  scroll depth, and behavior metrics broken down by dimensions like browser,
+  device, OS, and country. Runs as a stdio subprocess inside the agent sandbox;
+  the Clarity API token enters the container only as a credproxy placeholder,
+  swapped for the real value at TLS egress, so the sandbox never holds the
+  secret.
+source_url: https://github.com/microsoft/clarity-mcp-server
+tags: [microsoft, clarity, analytics, web-analytics, insights, data-export, stdio]
+transport: stdio
+command: npx
+args: ["@microsoft/clarity-mcp-server", "--clarity_api_token=${CLARITY_API_TOKEN}"]
+timeout: 300
+# Hosts the token may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - www.clarity.ms

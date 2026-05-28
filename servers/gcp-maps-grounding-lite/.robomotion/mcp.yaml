@@ -1,0 +1,23 @@
+type: mcp
+name: gcp-maps-grounding-lite
+title: Google Maps Grounding Lite
+author: Google
+version: 1.0.0
+license: Apache-2.0
+category: Productivity
+summary: Google's managed Maps Grounding Lite remote MCP server. Tools to ground
+  model responses in Google Maps data — place search, place details, geocoding,
+  and directions. Rides Robomotion credproxy — the Maps Platform API key is
+  swapped into the X-Goog-Api-Key header at egress; the sandbox sees only a
+  placeholder.
+source_url: https://developers.google.com/maps/ai/grounding-lite
+tags: [google, maps, places, geocoding, directions, grounding, location]
+transport: http
+url: https://mapstools.googleapis.com/mcp
+headers:
+  - "X-Goog-Api-Key=${GOOGLE_MAPS_API_KEY}"
+timeout: 300
+# Hosts the key may egress to. credproxy refuses to substitute the
+# placeholder for any other destination (placeholder-replay defense).
+egress_hosts:
+  - mapstools.googleapis.com
