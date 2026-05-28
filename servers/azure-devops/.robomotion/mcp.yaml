@@ -1,0 +1,17 @@
+type: mcp
+name: azure-devops
+title: Azure DevOps
+author: Microsoft
+version: 1.0.0
+license: MIT
+category: Developer Tools
+summary: Microsoft's Azure DevOps MCP server. Tools for work items, repositories,
+  pull requests, pipelines, test plans, and wikis across an Azure DevOps
+  organization. Runs as a local stdio subprocess via npx; the personal access
+  token is held host-side by the credstdio bridge.
+source_url: https://github.com/microsoft/azure-devops-mcp
+tags: [azure-devops, microsoft, work-items, repos, pipelines, boards, stdio]
+transport: stdio
+command: npx
+args: ["-y", "@azure-devops/mcp", "${AZURE_DEVOPS_ORG}"]
+timeout: 300

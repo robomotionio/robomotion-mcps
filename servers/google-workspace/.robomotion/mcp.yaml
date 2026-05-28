@@ -1,0 +1,18 @@
+type: mcp
+name: google-workspace
+title: Google Workspace (Remote)
+author: Google Workspace
+version: 1.0.0
+license: MIT
+category: Productivity
+summary: Google Workspace MCP server (Gmail, Drive, Calendar, Docs, Sheets,
+  Slides) over streamable HTTP. Connects to a self-hosted Workspace MCP
+  deployment; the access token is swapped into the Authorization header at egress
+  by credproxy, so the sandbox only sees a placeholder.
+source_url: https://github.com/taylorwilsdon/google_workspace_mcp
+tags: [google-workspace, gmail, drive, calendar, docs, sheets, productivity]
+transport: http
+url: https://workspace-mcp.example.com/mcp
+headers:
+  - "Authorization=Bearer ${GOOGLE_WORKSPACE_MCP_TOKEN}"
+timeout: 300

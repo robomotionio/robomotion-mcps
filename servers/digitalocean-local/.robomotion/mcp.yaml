@@ -1,0 +1,18 @@
+type: mcp
+name: digitalocean-local
+title: DigitalOcean (Local)
+author: DigitalOcean
+version: 1.0.0
+license: MIT
+category: DevOps
+summary: DigitalOcean's MCP server run locally via npx. Same App Platform +
+  database tooling as the remote server, but spawned as a stdio subprocess.
+  Runs through the Robomotion credstdio bridge — the real API token is held
+  host-side only; the sandboxed agent attaches over a loopback socket and never
+  receives the secret.
+source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+tags: [digitalocean, devops, cloud, apps, databases, deploy, stdio]
+transport: stdio
+command: npx
+args: ["@digitalocean/mcp", "--services", "apps,databases"]
+timeout: 300

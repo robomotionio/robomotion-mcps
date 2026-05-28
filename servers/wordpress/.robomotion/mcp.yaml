@@ -1,0 +1,17 @@
+type: mcp
+name: wordpress
+title: WordPress
+author: Automattic
+version: 1.0.0
+license: GPL-2.0
+category: Content
+summary: WordPress MCP server. Tools for posts, pages, media, users, comments,
+  and site settings via the WordPress REST API. Runs as a local stdio
+  subprocess; the application-password credentials are held host-side by the
+  credstdio bridge and never enter the agent sandbox.
+source_url: https://github.com/Automattic/wordpress-mcp
+tags: [wordpress, cms, content, posts, pages, rest-api, stdio]
+transport: stdio
+command: npx
+args: ["-y", "@automattic/mcp-wordpress-remote"]
+timeout: 300

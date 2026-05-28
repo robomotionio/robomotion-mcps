@@ -1,0 +1,220 @@
+schema_version: 1
+servers:
+- name: azure-devops
+  path: servers/azure-devops
+  title: Azure DevOps
+  summary: Microsoft's Azure DevOps MCP server. Tools for work items, repositories, pull requests, pipelines, test plans,
+    and wikis across an Azure DevOps organization. Runs as a local stdio subprocess via npx; the personal access token is
+    held host-side by the credstdio bridge.
+  version: 1.0.0
+  author: Microsoft
+  source_url: https://github.com/microsoft/azure-devops-mcp
+  license: MIT
+  category: Developer Tools
+  tags:
+  - azure-devops
+  - microsoft
+  - work-items
+  - repos
+  - pipelines
+  - boards
+  - stdio
+  transport: stdio
+  command: npx
+  args:
+  - -y
+  - '@azure-devops/mcp'
+  - ${AZURE_DEVOPS_ORG}
+  url: ''
+  headers: []
+  timeout: 300
+  env:
+    required:
+    - AZURE_DEVOPS_ORG
+    optional:
+    - AZURE_DEVOPS_PAT
+  content_hash: 9f9e6e9163ed
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.optional
+  - env.required
+- name: digitalocean
+  path: servers/digitalocean
+  title: DigitalOcean (Remote)
+  summary: DigitalOcean's hosted MCP server for App Platform — deploy, inspect, and manage apps, deployments, and databases.
+    Rides Robomotion credproxy (the API token is swapped into the Authorization header at TLS egress; the sandbox only ever
+    sees a placeholder).
+  version: 1.0.0
+  author: DigitalOcean
+  source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+  license: MIT
+  category: DevOps
+  tags:
+  - digitalocean
+  - devops
+  - cloud
+  - apps
+  - databases
+  - deploy
+  transport: http
+  command: ''
+  args: []
+  url: https://apps.mcp.digitalocean.com/mcp
+  headers:
+  - Authorization=Bearer ${DIGITALOCEAN_API_TOKEN}
+  timeout: 300
+  env:
+    required:
+    - DIGITALOCEAN_API_TOKEN
+    optional: []
+  content_hash: 5a9144cd369c
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: digitalocean-local
+  path: servers/digitalocean-local
+  title: DigitalOcean (Local)
+  summary: DigitalOcean's MCP server run locally via npx. Same App Platform + database tooling as the remote server, but spawned
+    as a stdio subprocess. Runs through the Robomotion credstdio bridge — the real API token is held host-side only; the sandboxed
+    agent attaches over a loopback socket and never receives the secret.
+  version: 1.0.0
+  author: DigitalOcean
+  source_url: https://github.com/digitalocean-labs/mcp-digitalocean
+  license: MIT
+  category: DevOps
+  tags:
+  - digitalocean
+  - devops
+  - cloud
+  - apps
+  - databases
+  - deploy
+  - stdio
+  transport: stdio
+  command: npx
+  args:
+  - '@digitalocean/mcp'
+  - --services
+  - apps,databases
+  url: ''
+  headers: []
+  timeout: 300
+  env:
+    required:
+    - DIGITALOCEAN_API_TOKEN
+    optional: []
+  content_hash: 547e826dfe58
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: github
+  path: servers/github
+  title: GitHub (Remote)
+  summary: GitHub's official remote MCP server. Tools for repositories, issues, pull requests, Actions, code search, and more.
+    Rides Robomotion credproxy — the personal access token is swapped into the Authorization header at egress; the sandbox
+    sees only a placeholder.
+  version: 1.0.0
+  author: GitHub
+  source_url: https://github.com/github/github-mcp-server
+  license: MIT
+  category: Developer Tools
+  tags:
+  - github
+  - git
+  - repos
+  - issues
+  - pull-requests
+  - actions
+  - code-search
+  transport: http
+  command: ''
+  args: []
+  url: https://api.githubcopilot.com/mcp/
+  headers:
+  - Authorization=Bearer ${GITHUB_PERSONAL_ACCESS_TOKEN}
+  timeout: 300
+  env:
+    required:
+    - GITHUB_PERSONAL_ACCESS_TOKEN
+    optional: []
+  content_hash: d4a01d9da8d6
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
+- name: google-workspace
+  path: servers/google-workspace
+  title: Google Workspace (Remote)
+  summary: Google Workspace MCP server (Gmail, Drive, Calendar, Docs, Sheets, Slides) over streamable HTTP. Connects to a
+    self-hosted Workspace MCP deployment; the access token is swapped into the Authorization header at egress by credproxy,
+    so the sandbox only sees a placeholder.
+  version: 1.0.0
+  author: Google Workspace
+  source_url: https://github.com/taylorwilsdon/google_workspace_mcp
+  license: MIT
+  category: Productivity
+  tags:
+  - google-workspace
+  - gmail
+  - drive
+  - calendar
+  - docs
+  - sheets
+  - productivity
+  transport: http
+  command: ''
+  args: []
+  url: https://workspace-mcp.example.com/mcp
+  headers:
+  - Authorization=Bearer ${GOOGLE_WORKSPACE_MCP_TOKEN}
+  timeout: 300
+  env:
+    required: []
+    optional:
+    - GOOGLE_WORKSPACE_MCP_TOKEN
+  content_hash: c8133c8a3666
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.optional
+- name: wordpress
+  path: servers/wordpress
+  title: WordPress
+  summary: WordPress MCP server. Tools for posts, pages, media, users, comments, and site settings via the WordPress REST
+    API. Runs as a local stdio subprocess; the application-password credentials are held host-side by the credstdio bridge
+    and never enter the agent sandbox.
+  version: 1.0.0
+  author: Automattic
+  source_url: https://github.com/Automattic/wordpress-mcp
+  license: GPL-2.0
+  category: Content
+  tags:
+  - wordpress
+  - cms
+  - content
+  - posts
+  - pages
+  - rest-api
+  - stdio
+  transport: stdio
+  command: npx
+  args:
+  - -y
+  - '@automattic/mcp-wordpress-remote'
+  url: ''
+  headers: []
+  timeout: 300
+  env:
+    required:
+    - WORDPRESS_API_URL
+    - WORDPRESS_USERNAME
+    - WORDPRESS_PASSWORD
+    optional: []
+  content_hash: 41f79030274c
+  files:
+  - .robomotion/mcp.yaml
+  - MCP.md
+  - env.required
