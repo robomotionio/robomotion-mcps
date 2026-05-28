@@ -13,8 +13,8 @@ summary: Google's official Google Analytics MCP server. Tools to explore your GA
 source_url: https://github.com/googleanalytics/google-analytics-mcp
 tags: [google-analytics, ga4, analytics, reporting, admin-api, data-api, stdio]
 transport: stdio
-command: pipx
-args: ["run", "analytics-mcp"]
+command: uvx
+args: ["analytics-mcp"]
 timeout: 300
 # Hosts the credentials may egress to. credproxy refuses to substitute the
 # placeholder for any other destination (placeholder-replay defense).

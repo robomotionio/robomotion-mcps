@@ -6,7 +6,7 @@ Analytics Admin API and the Analytics Data API.
 
 ## Transport
 
-**stdio** — `pipx run analytics-mcp`. It is spawned host-side by the
+**stdio** — `uvx analytics-mcp`. It is spawned host-side by the
 **credstdio** bridge; the agent attaches over a loopback socket and never sees
 the credentials.
 

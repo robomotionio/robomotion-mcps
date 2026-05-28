@@ -1525,9 +1525,8 @@ servers:
   - data-api
   - stdio
   transport: stdio
-  command: pipx
+  command: uvx
   args:
-  - run
   - analytics-mcp
   url: ''
   headers: []
@@ -1540,7 +1539,7 @@ servers:
     - GOOGLE_APPLICATION_CREDENTIALS
     optional:
     - GOOGLE_PROJECT_ID
-  content_hash: cbb6810c8132
+  content_hash: 75106befdfc3
   files:
   - .robomotion/mcp.yaml
   - MCP.md
